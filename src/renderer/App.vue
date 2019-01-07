@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="min-h-screen md:flex">
     <div class="flex-none w-full md:max-w-xs bg-grey">
-      <div class="text-center">
+      <div class="m-4">
         <v-clock></v-clock>
       </div>
     </div>

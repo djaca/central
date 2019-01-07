@@ -1,8 +1,7 @@
 <template>
-  <div class="h-screen text-white" style="background-image: linear-gradient(120deg, #f6d365 0%, #fda085 100%);">
-    <div class="pt-2 pl-2">
-      <word-counter></word-counter>
-    </div>
+  <div class="h-screen text-white p-4" style="background-image: linear-gradient(120deg, #f6d365 0%, #fda085 100%);">
+    <word-counter></word-counter>
+
     <div class="mt-8">
       <textarea
         class="textarea w-full bg-transparent text-black font-medium text-2xl"
