@@ -594,6 +594,11 @@ autoprefixer@^9.3.1:
     postcss "^7.0.7"
     postcss-value-parser "^3.3.1"
 
+autosize@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/autosize/-/autosize-4.0.2.tgz#073cfd07c8bf45da4b9fd153437f5bafbba1e4c9"
+  integrity sha512-jnSyH2d+qdfPGpWlcuhGiHmqBJ6g3X+8T+iRwFrHPLVcdoGJE/x6Qicm6aDHfTsbgZKxyV8UU/YB2p4cjKDRRA==
+
 aws-sign2@~0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/aws-sign2/-/aws-sign2-0.7.0.tgz#b46e890934a9591f2d2f6f86d7e6a9f1b3fe76a8"
@@ -2482,6 +2487,11 @@ cosmiconfig@^4.0.0:
     js-yaml "^3.9.0"
     parse-json "^4.0.0"
     require-from-string "^2.0.1"
+
+countable@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/countable/-/countable-3.0.1.tgz#1d0c1c426e8db08890534151ac7448c3642496ce"
+  integrity sha512-dz/sdi+RFpHJKMen5RAB9EKpCKd/q5WMfxG3SbdbQ3Pak4+SEPmDhVWZF0GTTHwjqjR+7DmiZHzZiFJ4qeAzmg==
 
 create-ecdh@^4.0.0:
   version "4.0.3"
@@ -8867,6 +8877,13 @@ vm-browserify@0.0.4:
   integrity sha1-XX6kW7755Kb/ZflUOOCofDV9WnM=
   dependencies:
     indexof "0.0.1"
+
+vue-countable@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/vue-countable/-/vue-countable-1.0.7.tgz#d7c2d89d7cadb24061dc0fa526a47fc42877955b"
+  integrity sha512-0TMcy927mU7VWOb7Fp1eLeiyGdqu+5j0p+MKBktCXpq9/Ndq7GmVpm74oSuSqOcABT3LsPF3DrkAHCXVSL/Duw==
+  dependencies:
+    countable "^3.0.1"
 
 vue-electron@^1.0.6:
   version "1.0.6"
