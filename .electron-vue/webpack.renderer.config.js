@@ -56,7 +56,10 @@ let rendererConfig = {
       },
       {
         test: /\.css$/,
-        use: ['vue-style-loader', 'css-loader']
+        use: ['vue-style-loader',
+          {loader: 'css-loader', options: {importLoaders: 1}},
+          'postcss-loader'
+        ]
       },
       {
         test: /\.html$/,

@@ -1,0 +1,9 @@
+@tailwind preflight;
+
+@tailwind components;
+
+textarea {
+    outline: none;
+}
+
+@tailwind utilities;
