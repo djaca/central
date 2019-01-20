@@ -44,8 +44,17 @@
       },
 
       forfeit () {
-        // todo: dialog...
-        this.$store.dispatch('pomodoro/forfeit')
+        this.$swal.fire({
+          title: 'Do you really want to forfeit this work session?',
+          type: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, I give up!',
+          cancelButtonText: 'No! I can do this!'
+        }).then((result) => {
+          if (result.value) {
+            this.$store.dispatch('pomodoro/forfeit')
+          }
+        })
       }
     }
   }

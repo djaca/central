@@ -5,6 +5,14 @@ import App from './App'
 import router from './router'
 import store from './store'
 import '@/assets/styles.css'
+import VueSweetalert2 from 'vue-sweetalert2'
+
+const options = {
+  confirmButtonColor: '#41b882',
+  cancelButtonColor: '#ff7674'
+}
+
+Vue.use(VueSweetalert2, options)
 
 require('dotenv').config()
 

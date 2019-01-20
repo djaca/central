@@ -30,6 +30,7 @@
     "vue-countable": "^1.0.7",
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",
+    "vue-sweetalert2": "^1.6.4",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
