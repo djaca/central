@@ -1,10 +1,11 @@
-let tempTime = (0.1 * 60)
+let tempTime = (0.1 * 30)
 
 const state = {
   timer: null,
   totalTime: tempTime,
-  shortBreak: 5,
-  longBreak: 15,
+  isBreak: false,
+  shortBreak: 0.1,
+  longBreak: 0.2,
   longBreakInterval: 3,
   workSession: 0
 }
@@ -16,12 +17,22 @@ const getters = {
 
   isActive: state => !!state.timer,
 
-  workSession: state => state.workSession
+  workSession: state => state.workSession,
+
+  onBreak: state => state.isBreak,
+
+  isLongBreak: state => state.workSession % state.longBreakInterval === 0,
+
+  breakDuration: (state, getters) => getters.isLongBreak ? state.longBreak : state.shortBreak
 }
 
 const mutations = {
   SET_TIMER (state, payload) {
     state.timer = payload
+  },
+
+  SET_TOTAL_TIME (state, payload) {
+    state.totalTime = payload
   },
 
   DECREMENT_TOTAL_TIME (state) {
@@ -38,24 +49,47 @@ const mutations = {
     clearInterval(state.timer)
 
     state.timer = null
+  },
+
+  TOGGLE_BREAK (state, payload) {
+    state.isBreak = payload
   }
 }
 
 const actions = {
-  init ({ commit, state }) {
+  init ({ commit, state, getters }) {
     let timer = setInterval(() => {
-      if (state.totalTime > 0) {
+      if (state.totalTime > 1) {
         commit('DECREMENT_TOTAL_TIME')
 
         return
       }
-      // when done successfully work session:
-      console.log('done')
-      commit('INCREMENT_WORK_SESSION')
+
+      getters.onBreak ? commit('TOGGLE_BREAK', false) : commit('INCREMENT_WORK_SESSION')
+
       commit('RESET')
     }, 1000)
 
     commit('SET_TIMER', timer)
+  },
+
+  initWorkSession ({ commit, dispatch }) {
+    commit('TOGGLE_BREAK', false)
+
+    dispatch('init')
+  },
+
+  initBreak ({ commit, state, getters, dispatch }) {
+    commit('SET_TOTAL_TIME', (getters.isLongBreak ? state.longBreak : state.shortBreak) * 60)
+
+    commit('TOGGLE_BREAK', true)
+
+    dispatch('init')
+  },
+
+  endBreak ({ commit }) {
+    commit('TOGGLE_BREAK', false)
+    commit('RESET')
   },
 
   forfeit ({commit}) {

@@ -1,25 +1,39 @@
 <template>
   <div class="py-2 px-6">
     <div class="text-center">
-      <div>
-        <time class="text-green-dark">
-          <span>{{ minutes }}</span>
-          <span>:</span>
-          <span>{{ seconds }}</span>
-        </time>
+      <div class="text-5xl h-32">
+        <div
+          class="pt-6"
+          v-show="!isActive"
+        >
+          Ready to go to work?
+        </div>
+
+        <div v-show="isActive">
+          <time class="text-grey-lightest font-bold">
+            <span>{{ minutes }}</span>
+            <span>:</span>
+            <span>{{ seconds }}</span>
+          </time>
+        </div>
       </div>
 
       <button
-        class="bg-transparent hover:text-white py-2 px-4 text-2xl hover:border-transparent rounded"
+        class="bg-transparent hover:text-white py-2 px-4 text-2xl hover:border-transparent rounded-full hover:bg-red-lighter text-red"
+        v-if="onBreak"
+        @click="skipBreak"
+      >
+        Skip break
+      </button>
+
+      <button
+        class="bg-transparent hover:text-white py-2 px-4 text-2xl hover:border-transparent rounded-full"
         :class="isActive ? 'hover:bg-red-lighter text-red' : 'hover:bg-green-light text-green'"
         @click="action"
+        v-else
       >
         {{ isActive ? 'Forfeit' : 'Start' }} work session
       </button>
-    </div>
-
-    <div class="text-lg">
-      Work sessions completed today: {{ workSession }}
     </div>
   </div>
 </template>
@@ -31,7 +45,7 @@
     name: 'Timer',
 
     computed: {
-      ...mapGetters('pomodoro', ['minutes', 'seconds', 'isActive', 'workSession'])
+      ...mapGetters('pomodoro', ['minutes', 'seconds', 'isActive', 'workSession', 'onBreak', 'breakDuration'])
     },
 
     watch: {
@@ -41,12 +55,16 @@
     },
 
     methods: {
+      skipBreak () {
+        this.$store.dispatch('pomodoro/endBreak')
+      },
+
       action () {
         this.isActive ? this.forfeit() : this.start()
       },
 
       start () {
-        this.$store.dispatch('pomodoro/init')
+        this.$store.dispatch('pomodoro/initWorkSession')
       },
 
       forfeit () {
@@ -66,7 +84,7 @@
 
       openBreakDialog () {
         this.$swal.fire({
-          title: 'You can now take 5 minutes break',
+          title: `You can now take ${this.breakDuration} minutes break`,
           type: 'success',
           allowEnterKey: false,
           allowEscapeKey: false,
@@ -78,6 +96,11 @@
         }).then((result) => {
           if (result.value) {
             this.$store.dispatch('pomodoro/forfeit')
+          } else if (
+            // Read more about handling dismissals
+            result.dismiss === this.$swal.DismissReason.cancel
+          ) {
+            this.$store.dispatch('pomodoro/initBreak')
           }
         })
       }
