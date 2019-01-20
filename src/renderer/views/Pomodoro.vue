@@ -1,8 +1,6 @@
 <template>
   <div class="h-screen bg-grey">
-    <div class="p-2 text-center">
-      <timer></timer>
-    </div>
+    <timer></timer>
   </div>
 </template>
 

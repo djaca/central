@@ -6,8 +6,7 @@ const state = {
   shortBreak: 5,
   longBreak: 15,
   longBreakInterval: 3,
-  workSession: 0,
-  resetButton: false
+  workSession: 0
 }
 
 const getters = {
@@ -15,7 +14,9 @@ const getters = {
 
   seconds: (state, getters) => padTime(state.totalTime - (getters.minutes * 60)),
 
-  isActive: state => !!state.timer
+  isActive: state => !!state.timer,
+
+  workSession: state => state.workSession
 }
 
 const mutations = {
@@ -25,6 +26,10 @@ const mutations = {
 
   DECREMENT_TOTAL_TIME (state) {
     state.totalTime--
+  },
+
+  INCREMENT_WORK_SESSION (state) {
+    state.workSession++
   },
 
   RESET (state) {
@@ -44,6 +49,9 @@ const actions = {
 
         return
       }
+      // when done successfully work session:
+      console.log('done')
+      commit('INCREMENT_WORK_SESSION')
       commit('RESET')
     }, 1000)
 

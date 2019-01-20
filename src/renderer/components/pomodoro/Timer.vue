@@ -1,20 +1,26 @@
 <template>
-  <div>
-    <div>
-      <time class="text-green-dark">
-        <span>{{ minutes }}</span>
-        <span>:</span>
-        <span>{{ seconds }}</span>
-      </time>
+  <div class="p-2">
+    <div class="text-center">
+      <div>
+        <time class="text-green-dark">
+          <span>{{ minutes }}</span>
+          <span>:</span>
+          <span>{{ seconds }}</span>
+        </time>
+      </div>
+
+      <button
+        class="bg-transparent hover:text-white py-2 px-4 text-2xl hover:border-transparent rounded"
+        :class="isActive ? 'hover:bg-red-lighter text-red' : 'hover:bg-green-light text-green'"
+        @click="action"
+      >
+        {{ isActive ? 'Forfeit' : 'Start' }} work session
+      </button>
     </div>
 
-    <button
-      class="bg-transparent hover:text-white py-2 px-4 hover:border-transparent rounded"
-      :class="isActive ? 'hover:bg-red-lighter text-red' : 'hover:bg-green-light text-green'"
-      @click="action"
-    >
-      {{ isActive ? 'Forfeit' : 'Start' }} work session
-    </button>
+    <div class="text-lg">
+      Work sessions completed today: {{ workSession }}
+    </div>
   </div>
 </template>
 
@@ -25,7 +31,7 @@
     name: 'Timer',
 
     computed: {
-      ...mapGetters('pomodoro', ['minutes', 'seconds', 'isActive'])
+      ...mapGetters('pomodoro', ['minutes', 'seconds', 'isActive', 'workSession'])
     },
 
     methods: {
