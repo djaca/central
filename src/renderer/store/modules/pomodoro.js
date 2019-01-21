@@ -1,19 +1,19 @@
-let tempTime = (0.1 * 30)
+let workTime = (25 * 60)
 
 const state = {
   timer: null,
-  totalTime: tempTime,
+  workTime,
   isBreak: false,
-  shortBreak: 0.1,
-  longBreak: 0.2,
+  shortBreak: 5,
+  longBreak: 15,
   longBreakInterval: 3,
   workSession: 0
 }
 
 const getters = {
-  minutes: state => padTime(Math.floor(state.totalTime / 60)),
+  minutes: state => padTime(Math.floor(state.workTime / 60)),
 
-  seconds: (state, getters) => padTime(state.totalTime - (getters.minutes * 60)),
+  seconds: (state, getters) => padTime(state.workTime - (getters.minutes * 60)),
 
   isActive: state => !!state.timer,
 
@@ -32,11 +32,11 @@ const mutations = {
   },
 
   SET_TOTAL_TIME (state, payload) {
-    state.totalTime = payload
+    state.workTime = payload
   },
 
   DECREMENT_TOTAL_TIME (state) {
-    state.totalTime--
+    state.workTime--
   },
 
   INCREMENT_WORK_SESSION (state) {
@@ -44,7 +44,7 @@ const mutations = {
   },
 
   RESET (state) {
-    state.totalTime = tempTime
+    state.workTime = workTime
 
     clearInterval(state.timer)
 
@@ -59,7 +59,7 @@ const mutations = {
 const actions = {
   init ({ commit, state, getters }) {
     let timer = setInterval(() => {
-      if (state.totalTime > 1) {
+      if (state.workTime > 1) {
         commit('DECREMENT_TOTAL_TIME')
 
         return
