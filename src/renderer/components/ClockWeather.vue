@@ -22,7 +22,7 @@
         <div>Wind: {{ wind }}</div>
       </div>
 
-      <div class="flex items-center weather" v-show="currentTemp">
+      <div class="flex items-center weather">
         <div class="text-3xl">{{ currentTemp }}&deg;</div>
         <div class="ml-1">
           <div class="text-xs">{{ maxTemp }}&deg;</div>

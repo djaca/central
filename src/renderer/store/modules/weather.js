@@ -1,7 +1,12 @@
 import axios from 'axios'
 
+const getUri = city => {
+  return `https://api.openweathermap.org/data/2.5/weather?q=${city},rs&appid=13b7029b661d5987d0abab0e959da95c&units=metric`
+}
+
 const state = {
   interval: null,
+  city: 'Belgrade',
   weather: {
     icon: null
   },
@@ -59,19 +64,25 @@ const mutations = {
 }
 
 const actions = {
-  init ({commit}) {
-    let uri = `https://api.openweathermap.org/data/2.5/weather?q=Belgrade,rs&appid=${process.env.OPENWEATHERMAP_KEY}&units=metric`
+  init ({commit, state, dispatch}) {
+    let uri = getUri(state.city)
+
+    dispatch('fetchApi', uri)
 
     let interval = setInterval(() => {
-      axios.get(uri)
-        .then(({status, data}) => {
-          if (status === 200) {
-            commit('SET_DATA', data)
-          }
-        })
-    }, 1000)
+      dispatch('fetchApi', uri)
+    }, 1000 * 60 * 60)
 
     commit('SET_INTERVAL', interval)
+  },
+
+  fetchApi ({commit}, uri) {
+    axios.get(uri)
+      .then(({status, data}) => {
+        if (status === 200) {
+          commit('SET_DATA', data)
+        }
+      })
   }
 }
 
