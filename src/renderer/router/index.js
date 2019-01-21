@@ -7,6 +7,11 @@ export default new Router({
   routes: [
     {
       path: '/',
+      name: 'pomodoro',
+      component: require('@/views/Pomodoro').default
+    },
+    {
+      path: '/morning-pages',
       name: 'morning-pages',
       component: require('@/views/MorningPages').default
     },

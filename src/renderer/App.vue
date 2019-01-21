@@ -1,10 +1,7 @@
 <template>
   <div id="app" class="min-h-screen md:flex">
-    <div class="flex-none w-full md:max-w-xs bg-grey">
-      <div class="m-4">
-        <v-clock></v-clock>
-      </div>
-    </div>
+    <sidebar></sidebar>
+
     <div class="flex-1">
       <router-view></router-view>
     </div>
@@ -12,15 +9,11 @@
 </template>
 
 <script>
-  import VClock from '@/components/VClock'
+  import Sidebar from '@/components/Sidebar'
 
   export default {
     name: 'central',
 
-    components: {VClock}
+    components: {Sidebar}
   }
 </script>
-
-<style>
-  /* CSS */
-</style>
