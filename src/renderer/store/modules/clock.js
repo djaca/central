@@ -1,4 +1,7 @@
+import {padZero} from '@/utilities/helpers'
+
 const state = {
+  interval: null,
   date: new Date()
 }
 
@@ -15,12 +18,20 @@ const getters = {
 const mutations = {
   'SET_DATE' (state) {
     state.date = new Date()
+  },
+
+  SET_INTERVAL (state, payload) {
+    state.interval = payload
   }
 }
 
 const actions = {
   init ({commit}) {
-    commit('SET_DATE')
+    let interval = setInterval(() => {
+      commit('SET_DATE')
+    }, 1000)
+
+    commit('SET_INTERVAL', interval)
   }
 }
 
@@ -30,8 +41,4 @@ export default {
   mutations,
   getters,
   actions
-}
-
-function padZero (number) {
-  return number < 10 ? `0${number}` : number
 }

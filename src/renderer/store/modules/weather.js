@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 const state = {
+  interval: null,
   weather: {
     icon: null
   },
@@ -17,11 +18,19 @@ const state = {
 }
 
 const getters = {
-  pressure: state => state.pressure + ' hPa',
+  pressure: state => `${state.pressure} hPa`,
 
-  wind: state => state.wind.speed + ' m/s',
+  wind: state => `${state.wind.speed} m/s`,
 
-  icon: state => state.weather.icon ? `http://openweathermap.org/img/w/${state.weather.icon}.png` : ''
+  humidity: state => `${state.humidity} %`,
+
+  icon: state => state.weather.icon ? `http://openweathermap.org/img/w/${state.weather.icon}.png` : '',
+
+  current: state => state.temp.current,
+
+  min: state => state.temp.min,
+
+  max: state => state.temp.max
 }
 
 const mutations = {
@@ -42,6 +51,10 @@ const mutations = {
       return
     }
     state.temp.current = Math.floor(payload.main.temp)
+  },
+
+  SET_INTERVAL (state, payload) {
+    state.interval = payload
   }
 }
 
@@ -49,10 +62,16 @@ const actions = {
   init ({commit}) {
     let uri = `https://api.openweathermap.org/data/2.5/weather?q=Belgrade,rs&appid=${process.env.OPENWEATHERMAP_KEY}&units=metric`
 
-    axios.get(uri)
-      .then(({data}) => {
-        commit('SET_DATA', data)
-      })
+    let interval = setInterval(() => {
+      axios.get(uri)
+        .then(({status, data}) => {
+          if (status === 200) {
+            commit('SET_DATA', data)
+          }
+        })
+    }, 1000)
+
+    commit('SET_INTERVAL', interval)
   }
 }
 

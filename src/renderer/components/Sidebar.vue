@@ -1,7 +1,7 @@
 <template>
   <div class="flex-none w-full md:max-w-xs bg-grey">
     <div class="m-4">
-      <v-clock></v-clock>
+      <clock-weather></clock-weather>
     </div>
 
     <div class="menu mt-6">
@@ -29,12 +29,12 @@
 </template>
 
 <script>
-  import VClock from '@/components/VClock'
+  import ClockWeather from '@/components/ClockWeather'
 
   export default {
     name: 'Sidebar',
 
-    components: {VClock}
+    components: {ClockWeather}
   }
 </script>
 

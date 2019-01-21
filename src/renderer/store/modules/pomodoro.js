@@ -1,4 +1,6 @@
-let workTime = (25 * 60)
+import {padZero} from '@/utilities/helpers'
+
+let workTime = (25 * 60) // temp
 
 const state = {
   timer: null,
@@ -11,9 +13,9 @@ const state = {
 }
 
 const getters = {
-  minutes: state => padTime(Math.floor(state.workTime / 60)),
+  minutes: state => padZero(Math.floor(state.workTime / 60)),
 
-  seconds: (state, getters) => padTime(state.workTime - (getters.minutes * 60)),
+  seconds: (state, getters) => padZero(state.workTime - (getters.minutes * 60)),
 
   isActive: state => !!state.timer,
 
@@ -103,8 +105,4 @@ export default {
   mutations,
   getters,
   actions
-}
-
-function padTime (time) {
-  return (time < 10 ? '0' : '') + time
 }
