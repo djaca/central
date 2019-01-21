@@ -5,14 +5,16 @@ import App from './App'
 import router from './router'
 import store from './store'
 import '@/assets/styles.css'
-import VueSweetalert2 from 'vue-sweetalert2'
+import Swal from 'sweetalert2'
+import 'sweetalert2/dist/sweetalert2.min.css'
 
-const options = {
-  confirmButtonColor: '#41b882',
-  cancelButtonColor: '#ff7674'
+const swalPlugin = {}
+
+swalPlugin.install = function (Vue) {
+  Vue.prototype.$swal = Swal
 }
 
-Vue.use(VueSweetalert2, options)
+Vue.use(swalPlugin)
 
 require('dotenv').config()
 

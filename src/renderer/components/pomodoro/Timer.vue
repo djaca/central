@@ -69,14 +69,14 @@
 
       forfeit () {
         this.$swal.fire({
+          toast: true,
           title: 'Do you really want to forfeit this work session?',
           type: 'question',
           showCancelButton: true,
-          confirmButtonText: 'Yes, I give up!',
-          cancelButtonText: 'No! I can do this!'
+          confirmButtonText: 'No! I can do this!',
+          cancelButtonText: 'Yes, I give up!'
         }).then((result) => {
-          console.log('here')
-          if (result.value) {
+          if (result.dismiss === this.$swal.DismissReason.cancel) {
             this.$store.dispatch('pomodoro/forfeit')
           }
         })
@@ -84,24 +84,20 @@
 
       openBreakDialog () {
         this.$swal.fire({
+          toast: true,
           title: `You can now take ${this.breakDuration} minutes break`,
-          type: 'success',
-          allowEnterKey: false,
           allowEscapeKey: false,
-          allowOutsideClick: false,
           showCancelButton: true,
-          confirmButtonText: 'Skip break',
-          cancelButtonText: 'Take a break',
-          cancelButtonColor: 'blue'
+          confirmButtonText: 'Take a break',
+          cancelButtonText: 'Skip break'
         }).then((result) => {
           if (result.value) {
-            this.$store.dispatch('pomodoro/forfeit')
-          } else if (
-            // Read more about handling dismissals
-            result.dismiss === this.$swal.DismissReason.cancel
-          ) {
             this.$store.dispatch('pomodoro/initBreak')
+
+            return
           }
+
+          this.$store.dispatch('pomodoro/forfeit')
         })
       }
     }
