@@ -1,9 +1,6 @@
 import axios from 'axios'
 import config from '@/config'
-
-const getUri = location => {
-  return `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=13b7029b661d5987d0abab0e959da95c&units=metric`
-}
+import log from 'electron-log'
 
 const state = {
   interval: null,
@@ -24,6 +21,8 @@ const state = {
 }
 
 const getters = {
+  uri: state => `https://api.openweathermap.org/data/2.5/weather?q=${state.location}&appid=13b7029b661d5987d0abab0e959da95c&units=metric`,
+
   pressure: state => `${state.pressure} hPa`,
 
   wind: state => `${state.wind.speed} m/s`,
@@ -69,23 +68,23 @@ const mutations = {
 }
 
 const actions = {
-  init ({commit, state, dispatch}) {
+  init ({commit, state, dispatch, getters}) {
     let location = config.get('weather.city')
 
     if (!location) {
       // config.set('weather.city', 'Belgrade,rs')
       console.log('No city provided')
+      log.warn('No city provided')
 
       return
     }
 
     commit('SET_LOCATION', location)
-    let uri = getUri(location)
 
-    dispatch('fetchApi', uri)
+    dispatch('fetchApi', getters.uri)
 
     let interval = setInterval(() => {
-      dispatch('fetchApi', uri)
+      dispatch('fetchApi', getters.uri)
     }, 1000 * 60 * 60)
 
     commit('SET_INTERVAL', interval)
@@ -97,6 +96,9 @@ const actions = {
         if (status === 200) {
           commit('SET_DATA', data)
         }
+      })
+      .catch(err => {
+        log.error('Error fetching weather api!!! ' + err)
       })
   }
 }
