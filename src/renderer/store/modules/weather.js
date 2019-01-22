@@ -1,12 +1,13 @@
 import axios from 'axios'
+import config from '@/config'
 
-const getUri = city => {
-  return `https://api.openweathermap.org/data/2.5/weather?q=${city},rs&appid=13b7029b661d5987d0abab0e959da95c&units=metric`
+const getUri = location => {
+  return `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=13b7029b661d5987d0abab0e959da95c&units=metric`
 }
 
 const state = {
   interval: null,
-  city: 'Belgrade',
+  location: '',
   weather: {
     icon: null
   },
@@ -60,12 +61,26 @@ const mutations = {
 
   SET_INTERVAL (state, payload) {
     state.interval = payload
+  },
+
+  SET_LOCATION (state, payload) {
+    state.location = payload
   }
 }
 
 const actions = {
   init ({commit, state, dispatch}) {
-    let uri = getUri(state.city)
+    let location = config.get('weather.city')
+
+    if (!location) {
+      // config.set('weather.city', 'Belgrade,rs')
+      console.log('No city provided')
+
+      return
+    }
+
+    commit('SET_LOCATION', location)
+    let uri = getUri(location)
 
     dispatch('fetchApi', uri)
 
