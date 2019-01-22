@@ -58,7 +58,9 @@
     mounted () {
       this.$store.dispatch('clock/init')
 
-      this.$store.dispatch('weather/init')
+      if (process.env.NODE_ENV !== 'development') {
+        this.$store.dispatch('weather/init')
+      }
     },
 
     beforeDestroy () {
