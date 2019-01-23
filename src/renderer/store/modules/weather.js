@@ -4,7 +4,7 @@ import weather from '@/api/weather'
 
 const state = {
   interval: null,
-  location: null,
+  location: config.get('weather.city'),
   weather: {
     icon: null
   },
@@ -21,6 +21,8 @@ const state = {
 }
 
 const getters = {
+  isActive: state => !!state.interval,
+
   location: state => state.location,
 
   pressure: state => `${state.pressure} hPa`,
@@ -42,12 +44,9 @@ const mutations = {
   SET_DATA (state, payload) {
     state.temp.min = payload.main.temp_min
     state.temp.max = payload.main.temp_max
-
     state.weather.icon = payload.weather[0].icon
-
     state.humidity = payload.main.humidity
     state.pressure = payload.main.pressure
-
     state.wind.speed = payload.wind.speed
 
     if (payload.main.temp < 0) {
@@ -70,17 +69,15 @@ const mutations = {
 const actions = {
   init ({commit, state, dispatch}) {
     return new Promise((resolve, reject) => {
-      let location = config.get('weather.city')
+      if (!state.location) {
+        commit('SET_INTERVAL', null)
 
-      if (!location) {
-        // config.set('weather.city', 'Belgrade,rs')
         reject(new Error('No city provided'))
+
         log.warn('No city provided')
 
         return
       }
-
-      commit('SET_LOCATION', location)
 
       dispatch('fetchApi')
         .then(data => {
@@ -94,6 +91,7 @@ const actions = {
               })
               .catch(err => {
                 commit('SET_INTERVAL', null)
+
                 reject(err)
               })
           }, 1000 * 60 * 60)
@@ -101,6 +99,7 @@ const actions = {
           commit('SET_INTERVAL', interval)
         })
         .catch(err => {
+          commit('SET_INTERVAL', null)
           reject(err)
         })
     })
@@ -117,23 +116,23 @@ const actions = {
           }
 
           reject(new Error(data))
+
           log.warn('Weather status: ' + status)
+
           log.warn(data)
         })
         .catch(err => {
           reject(new Error('Error fetching weather api'))
+
           log.error('Error fetching weather api! ' + err)
         })
     })
-    // weather(state.location)
-    //   .then(({status, data}) => {
-    //     if (status === 200) {
-    //       commit('SET_DATA', data)
-    //     }
-    //   })
-    //   .catch(err => {
-    //     log.error('Error fetching weather api!!! ' + err)
-    //   })
+  },
+
+  setLocation ({commit, dispatch}, location) {
+    config.set('weather.city', location)
+
+    commit('SET_LOCATION', location)
   }
 }
 
