@@ -12,11 +12,11 @@
         </time>
       </div>
 
-      <img :src="icon" class="w-16 h-16">
+      <img :src="icon" class="w-16 h-16" alt="weather" v-show="location">
     </div>
 
-    <div class="flex justify-between items-start weather">
-      <div class="text-sm mt-2" v-show="wind">
+    <div class="flex justify-between items-start weather" v-show="location">
+      <div class="text-sm mt-2">
         <div>Humidity: {{ humidity }}</div>
         <div>Pressure: {{ pressure }}</div>
         <div>Wind: {{ wind }}</div>
@@ -41,6 +41,7 @@
 
     computed: {
       ...mapGetters({
+        location: 'weather/location',
         date: 'clock/date',
         hours: 'clock/hours',
         minutes: 'clock/minutes',
@@ -59,6 +60,12 @@
       this.$store.dispatch('clock/init')
 
       this.$store.dispatch('weather/init')
+        .catch(({message}) => {
+          this.$toast.fire({
+            title: message,
+            type: 'error'
+          })
+        })
       // if (process.env.NODE_ENV !== 'development') {
       // }
     },

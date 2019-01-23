@@ -12,6 +12,13 @@ const swalPlugin = {}
 
 swalPlugin.install = function (Vue) {
   Vue.prototype.$swal = Swal
+
+  Vue.prototype.$toast = Swal.mixin({
+    toast: true,
+    position: 'top',
+    showConfirmButton: false,
+    timer: 5000
+  })
 }
 
 Vue.use(swalPlugin)

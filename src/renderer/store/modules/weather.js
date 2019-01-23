@@ -1,10 +1,10 @@
-import axios from 'axios'
 import config from '@/config'
 import log from 'electron-log'
+import weather from '@/api/weather'
 
 const state = {
   interval: null,
-  location: '',
+  location: null,
   weather: {
     icon: null
   },
@@ -21,7 +21,7 @@ const state = {
 }
 
 const getters = {
-  uri: state => `https://api.openweathermap.org/data/2.5/weather?q=${state.location}&appid=13b7029b661d5987d0abab0e959da95c&units=metric`,
+  location: state => state.location,
 
   pressure: state => `${state.pressure} hPa`,
 
@@ -68,38 +68,72 @@ const mutations = {
 }
 
 const actions = {
-  init ({commit, state, dispatch, getters}) {
-    let location = config.get('weather.city')
+  init ({commit, state, dispatch}) {
+    return new Promise((resolve, reject) => {
+      let location = config.get('weather.city')
 
-    if (!location) {
-      // config.set('weather.city', 'Belgrade,rs')
-      console.log('No city provided')
-      log.warn('No city provided')
+      if (!location) {
+        // config.set('weather.city', 'Belgrade,rs')
+        reject(new Error('No city provided'))
+        log.warn('No city provided')
 
-      return
-    }
+        return
+      }
 
-    commit('SET_LOCATION', location)
+      commit('SET_LOCATION', location)
 
-    dispatch('fetchApi', getters.uri)
+      dispatch('fetchApi')
+        .then(data => {
+          commit('SET_DATA', data)
+        })
+        .then(() => {
+          let interval = setInterval(() => {
+            dispatch('fetchApi')
+              .then(data => {
+                commit('SET_DATA', data)
+              })
+              .catch(err => {
+                commit('SET_INTERVAL', null)
+                reject(err)
+              })
+          }, 1000 * 60 * 60)
 
-    let interval = setInterval(() => {
-      dispatch('fetchApi', getters.uri)
-    }, 1000 * 60 * 60)
-
-    commit('SET_INTERVAL', interval)
+          commit('SET_INTERVAL', interval)
+        })
+        .catch(err => {
+          reject(err)
+        })
+    })
   },
 
-  fetchApi ({commit}, uri) {
-    axios.get(uri)
-      .then(({status, data}) => {
-        if (status === 200) {
-          commit('SET_DATA', data)
-        }
-      })
-      .catch(err => {
-        log.error('Error fetching weather api!!! ' + err)
-      })
+  fetchApi ({state}) {
+    return new Promise((resolve, reject) => {
+      weather(state.location)
+        .then(({status, data}) => {
+          if (status === 200) {
+            resolve(data)
+
+            return
+          }
+
+          reject(new Error(data))
+          log.warn('Weather status: ' + status)
+          log.warn(data)
+        })
+        .catch(err => {
+          reject(new Error('Error fetching weather api'))
+          log.error('Error fetching weather api! ' + err)
+        })
+    })
+    // weather(state.location)
+    //   .then(({status, data}) => {
+    //     if (status === 200) {
+    //       commit('SET_DATA', data)
+    //     }
+    //   })
+    //   .catch(err => {
+    //     log.error('Error fetching weather api!!! ' + err)
+    //   })
   }
 }
 
