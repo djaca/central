@@ -45,11 +45,11 @@
     name: 'Timer',
 
     computed: {
-      ...mapGetters('pomodoro', ['minutes', 'seconds', 'isActive', 'workSession', 'onBreak', 'breakDuration'])
+      ...mapGetters('pomodoro', ['minutes', 'seconds', 'isActive', 'sessionCount', 'onBreak', 'breakDuration'])
     },
 
     watch: {
-      workSession () {
+      sessionCount () {
         this.openBreakDialog()
       }
     },

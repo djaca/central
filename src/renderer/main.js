@@ -7,6 +7,9 @@ import store from './store'
 import '@/assets/styles.css'
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
+import VModal from 'vue-js-modal'
+
+Vue.use(VModal, { dynamic: true, injectModalsContainer: true })
 
 const swalPlugin = {}
 

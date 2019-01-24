@@ -1,52 +1,66 @@
 import {padZero} from '@/utilities/helpers'
+import config from '@/config'
 
-let workTime = (25 * 60) // temp
+let sessionDuration = config.get('pomodoro.sessionDuration') || 25
+let shortBreak = config.get('pomodoro.shortBreak') || 5
+let longBreak = config.get('pomodoro.longBreak') || 15
+let longBreakInterval = config.get('pomodoro.longBreakInterval') || 3
 
 const state = {
   timer: null,
-  workTime,
   isBreak: false,
-  shortBreak: 5,
-  longBreak: 15,
-  longBreakInterval: 3,
-  workSession: 0
+  time: sessionDuration * 60,
+  sessionDuration,
+  shortBreak,
+  longBreak,
+  longBreakInterval,
+  sessionCount: 0
 }
 
 const getters = {
-  minutes: state => padZero(Math.floor(state.workTime / 60)),
+  minutes: state => padZero(Math.floor(state.time / 60)),
 
-  seconds: (state, getters) => padZero(state.workTime - (getters.minutes * 60)),
+  seconds: (state, getters) => padZero(state.time - (getters.minutes * 60)),
 
   isActive: state => !!state.timer,
 
-  workSession: state => state.workSession,
+  sessionCount: state => state.sessionCount,
 
   onBreak: state => state.isBreak,
 
-  isLongBreak: state => state.workSession % state.longBreakInterval === 0,
+  isLongBreak: state => state.sessionCount % state.longBreakInterval === 0,
 
   breakDuration: (state, getters) => getters.isLongBreak ? state.longBreak : state.shortBreak
 }
 
 const mutations = {
+  SET (state, { sessionDuration, shortBreak, longBreak, longBreakInterval }) {
+    config.set('pomodoro', { sessionDuration, shortBreak, longBreak, longBreakInterval })
+
+    state.sessionDuration = sessionDuration
+    state.shortBreak = shortBreak
+    state.longBreak = longBreak
+    state.longBreakInterval = longBreakInterval
+  },
+
   SET_TIMER (state, payload) {
     state.timer = payload
   },
 
   SET_TOTAL_TIME (state, payload) {
-    state.workTime = payload
+    state.time = payload * 60
   },
 
   DECREMENT_TOTAL_TIME (state) {
-    state.workTime--
+    state.time--
   },
 
   INCREMENT_WORK_SESSION (state) {
-    state.workSession++
+    state.sessionCount++
   },
 
   RESET (state) {
-    state.workTime = workTime
+    state.time = state.sessionDuration * 60
 
     clearInterval(state.timer)
 
@@ -61,7 +75,7 @@ const mutations = {
 const actions = {
   init ({ commit, state, getters }) {
     let timer = setInterval(() => {
-      if (state.workTime > 1) {
+      if (state.time > 1) {
         commit('DECREMENT_TOTAL_TIME')
 
         return
@@ -75,14 +89,16 @@ const actions = {
     commit('SET_TIMER', timer)
   },
 
-  initWorkSession ({ commit, dispatch }) {
+  initWorkSession ({ commit, state, dispatch }) {
+    commit('SET_TOTAL_TIME', state.sessionDuration)
+
     commit('TOGGLE_BREAK', false)
 
     dispatch('init')
   },
 
   initBreak ({ commit, state, getters, dispatch }) {
-    commit('SET_TOTAL_TIME', (getters.isLongBreak ? state.longBreak : state.shortBreak) * 60)
+    commit('SET_TOTAL_TIME', (getters.isLongBreak ? state.longBreak : state.shortBreak))
 
     commit('TOGGLE_BREAK', true)
 
@@ -91,6 +107,7 @@ const actions = {
 
   endBreak ({ commit }) {
     commit('TOGGLE_BREAK', false)
+
     commit('RESET')
   },
 
