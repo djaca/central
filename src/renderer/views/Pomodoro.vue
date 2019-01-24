@@ -10,6 +10,8 @@
 
     <div class="px-4 text-lg">
       Work sessions completed today: {{ sessionCount }}
+
+      <projects></projects>
     </div>
   </div>
 </template>
@@ -17,12 +19,13 @@
 <script>
   import Timer from '@/components/pomodoro/Timer'
   import Settings from '@/components/pomodoro/Settings'
+  import Projects from '@/components/pomodoro/Projects'
   import { mapGetters } from 'vuex'
 
   export default {
     name: 'Pomodoro',
 
-    components: {Timer},
+    components: {Timer, Projects},
 
     computed: {
       ...mapGetters('pomodoro', ['sessionCount'])
