@@ -13,6 +13,7 @@ let longBreakInterval = config.get('pomodoro.longBreakInterval') || 3
 const state = {
   timer: null,
   isBreak: false,
+  isSession: false,
   time: sessionDuration * 60,
   sessionDuration,
   shortBreak,
@@ -37,6 +38,8 @@ const getters = {
   sessionFinished: state => state.isWorkFinished,
 
   isLongBreak: (state, getters) => getters.sessionCount % state.longBreakInterval === 0,
+
+  isWorking: state => state.isSession,
 
   breakDuration: (state, getters) => getters.isLongBreak ? state.longBreak : state.shortBreak
 }
@@ -69,10 +72,16 @@ const mutations = {
 
   RESET (state) {
     state.time = state.sessionDuration * 60
+    state.isSession = false
+    state.isBreak = false
 
     clearInterval(state.timer)
 
     state.timer = null
+  },
+
+  TOGGLE_WORK (state, payload) {
+    state.isSession = payload
   },
 
   TOGGLE_BREAK (state, payload) {
@@ -126,6 +135,7 @@ const actions = {
   initSession ({ commit, state, dispatch }) {
     commit('SET_TOTAL_TIME', state.sessionDuration)
 
+    commit('TOGGLE_WORK', true)
     commit('TOGGLE_BREAK', false)
 
     dispatch('init')
@@ -134,6 +144,7 @@ const actions = {
   initBreak ({ commit, state, getters, dispatch }) {
     commit('SET_TOTAL_TIME', (getters.isLongBreak ? state.longBreak : state.shortBreak))
 
+    commit('TOGGLE_WORK', false)
     commit('TOGGLE_BREAK', true)
 
     dispatch('init')

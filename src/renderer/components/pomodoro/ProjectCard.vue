@@ -32,7 +32,10 @@
     props: ['project'],
 
     computed: {
-      ...mapGetters('projects', ['current']),
+      ...mapGetters({
+        current: 'projects/current',
+        isWorking: 'pomodoro/isWorking'
+      }),
 
       isCurrent () {
         return this.current._id === this.project._id
@@ -41,7 +44,9 @@
 
     methods: {
       select () {
-        this.$store.commit('projects/TOGGLE', this.project._id)
+        if (!this.isWorking) {
+          this.$store.commit('projects/TOGGLE', this.project._id)
+        }
       }
     }
   }
