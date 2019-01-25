@@ -45,12 +45,14 @@
     name: 'Timer',
 
     computed: {
-      ...mapGetters('pomodoro', ['minutes', 'seconds', 'isActive', 'sessionCount', 'onBreak', 'breakDuration'])
+      ...mapGetters('pomodoro', ['minutes', 'seconds', 'isActive', 'sessionCount', 'onBreak', 'sessionFinished', 'breakDuration'])
     },
 
     watch: {
-      sessionCount () {
-        this.openBreakDialog()
+      sessionFinished (val) {
+        if (val) {
+          this.openBreakDialog()
+        }
       }
     },
 
@@ -64,7 +66,7 @@
       },
 
       start () {
-        this.$store.dispatch('pomodoro/initWorkSession')
+        this.$store.dispatch('pomodoro/initSession')
       },
 
       forfeit () {
@@ -77,7 +79,7 @@
           cancelButtonText: 'Yes, I give up!'
         }).then((result) => {
           if (result.dismiss === this.$swal.DismissReason.cancel) {
-            this.$store.dispatch('pomodoro/forfeit')
+            this.$store.commit('pomodoro/RESET')
           }
         })
       },
@@ -91,13 +93,15 @@
           confirmButtonText: 'Take a break',
           cancelButtonText: 'Skip break'
         }).then((result) => {
+          this.$store.commit('pomodoro/SET_FINISH', false)
+
           if (result.value) {
             this.$store.dispatch('pomodoro/initBreak')
 
             return
           }
 
-          this.$store.dispatch('pomodoro/forfeit')
+          this.$store.commit('pomodoro/RESET')
         })
       }
     }

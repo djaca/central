@@ -32,6 +32,12 @@
       openSettings () {
         this.$modal.show(Settings)
       }
+    },
+
+    mounted () {
+      if (!this.sessionCount) {
+        this.$store.dispatch('pomodoro/getTodayWorkSessionCount')
+      }
     }
   }
 </script>

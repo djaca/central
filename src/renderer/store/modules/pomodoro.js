@@ -1,5 +1,9 @@
 import {padZero} from '@/utilities/helpers'
 import config from '@/config'
+import db from '@/database'
+import format from 'date-fns/format'
+
+const today = format(new Date(), 'MM-DD-YYYY')
 
 let sessionDuration = config.get('pomodoro.sessionDuration') || 25
 let shortBreak = config.get('pomodoro.shortBreak') || 5
@@ -14,7 +18,8 @@ const state = {
   shortBreak,
   longBreak,
   longBreakInterval,
-  sessionCount: 0
+  workSession: null,
+  isWorkFinished: false
 }
 
 const getters = {
@@ -24,11 +29,13 @@ const getters = {
 
   isActive: state => !!state.timer,
 
-  sessionCount: state => state.sessionCount,
+  sessionCount: state => state.workSession ? state.workSession.count : null,
 
   onBreak: state => state.isBreak,
 
-  isLongBreak: state => state.sessionCount % state.longBreakInterval === 0,
+  sessionFinished: state => state.isWorkFinished,
+
+  isLongBreak: (state, getters) => getters.sessionCount % state.longBreakInterval === 0,
 
   breakDuration: (state, getters) => getters.isLongBreak ? state.longBreak : state.shortBreak
 }
@@ -56,7 +63,7 @@ const mutations = {
   },
 
   INCREMENT_WORK_SESSION (state) {
-    state.sessionCount++
+    state.workSession.count++
   },
 
   RESET (state) {
@@ -69,11 +76,19 @@ const mutations = {
 
   TOGGLE_BREAK (state, payload) {
     state.isBreak = payload
+  },
+
+  SET_WORK_SESSION (state, payload) {
+    state.workSession = payload
+  },
+
+  SET_FINISH (state, payload) {
+    state.isWorkFinished = payload
   }
 }
 
 const actions = {
-  init ({ commit, state, getters }) {
+  init ({ commit, state, getters, dispatch }) {
     let timer = setInterval(() => {
       if (state.time > 1) {
         commit('DECREMENT_TOTAL_TIME')
@@ -81,15 +96,29 @@ const actions = {
         return
       }
 
-      getters.onBreak ? commit('TOGGLE_BREAK', false) : commit('INCREMENT_WORK_SESSION')
-
-      commit('RESET')
+      getters.onBreak ? dispatch('endBreak', false) : dispatch('endSession')
     }, 1000)
 
     commit('SET_TIMER', timer)
   },
 
-  initWorkSession ({ commit, state, dispatch }) {
+  endSession ({commit, state}) {
+    db.pomodoro.update({ _id: state.workSession._id }, { $set: { count: state.workSession.count + 1 } }, err => {
+      if (err) {
+        console.log(err)
+
+        return
+      }
+
+      commit('RESET')
+
+      commit('INCREMENT_WORK_SESSION')
+
+      commit('SET_FINISH', true)
+    })
+  },
+
+  initSession ({ commit, state, dispatch }) {
     commit('SET_TOTAL_TIME', state.sessionDuration)
 
     commit('TOGGLE_BREAK', false)
@@ -111,8 +140,32 @@ const actions = {
     commit('RESET')
   },
 
-  forfeit ({commit}) {
-    commit('RESET')
+  getTodayWorkSessionCount ({commit}) {
+    db.pomodoro.findOne({ date: today }, (err, doc) => {
+      if (err) {
+        console.log(err)
+
+        return
+      }
+
+      if (!doc) {
+        db.pomodoro.insert({
+          date: today,
+          count: 0
+        }, (err, newDoc) => {
+          if (err) {
+            console.log(err)
+            return
+          }
+
+          commit('SET_WORK_SESSION', newDoc)
+        })
+
+        return
+      }
+
+      commit('SET_WORK_SESSION', doc)
+    })
   }
 }
 
