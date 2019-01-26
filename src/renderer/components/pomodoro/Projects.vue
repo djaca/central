@@ -8,6 +8,7 @@
         <project-card
           :project="project"
           :key="project._id"
+          @edit="edit(project._id)"
         ></project-card>
       </div>
     </div>
@@ -36,6 +37,12 @@
     methods: {
       openModal () {
         this.$modal.show(ProjectForm)
+      },
+
+      edit (id) {
+        let project = this.projects.find(p => p._id === id)
+
+        this.$modal.show(ProjectForm, {project})
       }
     },
 

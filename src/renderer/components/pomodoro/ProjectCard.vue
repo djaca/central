@@ -10,9 +10,11 @@
       <div
         class="absolute pin-t pin-r"
         v-show="active"
-        @click="remove"
       >
-        <i class="material-icons text-red-light text-2xl">
+        <i class="material-icons text-blue text-2xl" @click="edit">
+          edit
+        </i>
+        <i class="material-icons text-red-light text-2xl" @click="remove">
           close
         </i>
       </div>
@@ -92,6 +94,10 @@
             this.$store.dispatch('projects/delete', this.project._id)
           }
         })
+      },
+
+      edit () {
+        this.$emit('edit')
       },
 
       mouseOver () {

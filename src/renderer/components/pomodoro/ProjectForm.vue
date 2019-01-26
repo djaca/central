@@ -1,6 +1,6 @@
 <template>
   <div class="py-4 w-5/6 mx-auto">
-    <div class="text-center text-3xl mb-6">Add Project</div>
+    <div class="text-center text-3xl mb-6">{{ this.project ? 'Edit' : 'Add' }} Project</div>
 
     <div class="my-2">
       <div class="flex items-center mb-4">
@@ -27,7 +27,7 @@
       </button>
 
       <button class="shadow bg-blue hover:bg-blue-light text-sm focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded" type="button" @click="save">
-        Save
+        {{ this.project ? 'Update' : 'Save' }}
       </button>
     </div>
   </div>
@@ -36,6 +36,8 @@
 <script>
   export default {
     name: 'ProjectForm',
+
+    props: ['project'],
 
     data () {
       return {
@@ -46,7 +48,11 @@
     methods: {
       save () {
         if (this.name !== '') {
-          this.$store.dispatch('projects/add', this.name)
+          if (this.project) {
+            this.$store.dispatch('projects/update', {id: this.project._id, name: this.name})
+          } else {
+            this.$store.dispatch('projects/add', this.name)
+          }
 
           this.$emit('close')
         }
@@ -55,6 +61,10 @@
 
     mounted () {
       this.$refs.name.focus()
+
+      if (this.project) {
+        this.name = this.project.name
+      }
     }
   }
 </script>

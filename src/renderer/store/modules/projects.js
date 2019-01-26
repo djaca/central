@@ -26,6 +26,10 @@ const mutations = {
     state.items.push(payload)
   },
 
+  UPDATE (state, payload) {
+    state.items.find(i => i._id === payload.id).name = payload.name
+  },
+
   DELETE (state, id) {
     state.items.splice(state.items.findIndex(i => i._id === id), 1)
 
@@ -59,6 +63,16 @@ const actions = {
       }
 
       commit('ADD', newDoc)
+    })
+  },
+
+  update ({commit}, payload) {
+    remoteProjects.update({ _id: payload.id }, { $set: { name: payload.name } }, err => {
+      if (err) {
+        console.log(err)
+      }
+
+      commit('UPDATE', payload)
     })
   },
 
