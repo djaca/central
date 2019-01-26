@@ -4,13 +4,13 @@ const remoteProjects = db.projects
 
 const state = {
   items: null,
-  current: {}
+  current: null
 }
 
 const getters = {
   projects: state => state.items,
 
-  current: state => state.current
+  current: state => state.current ? state.current : {}
 }
 
 const mutations = {
@@ -30,7 +30,7 @@ const mutations = {
     state.items.splice(state.items.findIndex(i => i._id === id), 1)
 
     if (state.current._id === id) {
-      state.current = {}
+      state.current = null
     }
   }
 }
