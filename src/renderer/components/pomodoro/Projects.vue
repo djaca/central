@@ -21,6 +21,7 @@
 
 <script>
   import ProjectCard from '@/components/pomodoro/ProjectCard'
+  import {mapGetters} from 'vuex'
 
   export default {
     name: 'Projects',
@@ -28,8 +29,12 @@
     components: {ProjectCard},
 
     computed: {
-      projects () {
-        return this.$store.state.projects.items
+      ...mapGetters('projects', ['projects'])
+    },
+
+    mounted () {
+      if (!this.projects) {
+        this.$store.dispatch('projects/get')
       }
     }
   }
