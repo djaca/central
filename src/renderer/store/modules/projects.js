@@ -3,34 +3,12 @@ import db from '@/database'
 const remoteProjects = db.projects
 
 const state = {
-  // items: [
-  //   {
-  //     _id: 1,
-  //     name: 'No project specified'
-  //   },
-  //   {
-  //     _id: 2,
-  //     name: 'central'
-  //   },
-  //   {
-  //     _id: 3,
-  //     name: 'tv-shows'
-  //   },
-  //   {
-  //     _id: 4,
-  //     name: 'goodwork'
-  //   }
-  // ],
   items: null,
-  current: null
-  // current: {
-  //   _id: 1,
-  //   name: 'No project specified'
-  // }
+  current: {}
 }
 
 const getters = {
-  projects: state => state.projects,
+  projects: state => state.items,
 
   current: state => state.current
 }
@@ -42,6 +20,10 @@ const mutations = {
 
   SET_CURRENT (state, id) {
     state.current = state.items.find(i => i._id === id)
+  },
+
+  ADD (state, payload) {
+    state.items.push(payload)
   }
 }
 
@@ -55,6 +37,20 @@ const actions = {
       }
 
       commit('SET_PROJECTS', docs)
+    })
+  },
+
+  add ({commit}, name) {
+    let data = {name}
+
+    remoteProjects.insert(data, (err, newDoc) => {
+      if (err) {
+        console.log(err)
+
+        return
+      }
+
+      commit('ADD', newDoc)
     })
   }
 }

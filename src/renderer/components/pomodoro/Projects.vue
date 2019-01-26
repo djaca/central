@@ -13,7 +13,7 @@
     </div>
 
     <button
-      class="mt-6 bg-transparent hover:bg-blue text-blue-dark font-semibold hover:text-white py-2 px-4 border border-blue hover:border-transparent rounded">
+      class="mt-6 bg-transparent hover:bg-blue text-blue-dark font-semibold hover:text-white py-2 px-4 border border-blue hover:border-transparent rounded" @click="openModal">
       Add project
     </button>
   </div>
@@ -21,15 +21,22 @@
 
 <script>
   import ProjectCard from '@/components/pomodoro/ProjectCard'
+  import ProjectForm from '@/components/pomodoro/ProjectForm'
   import {mapGetters} from 'vuex'
 
   export default {
     name: 'Projects',
 
-    components: {ProjectCard},
+    components: {ProjectCard, ProjectForm},
 
     computed: {
       ...mapGetters('projects', ['projects'])
+    },
+
+    methods: {
+      openModal () {
+        this.$modal.show(ProjectForm)
+      }
     },
 
     mounted () {
