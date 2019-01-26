@@ -52,6 +52,10 @@ const actions = {
 
       commit('ADD', newDoc)
     })
+  },
+
+  delete ({commit}, id) {
+    console.log(id)
   }
 }
 

@@ -3,8 +3,19 @@
     class="overflow-hidden rounded-lg shadow-md hover:shadow-lg cursor-pointer bg-white relative"
     @click="select"
     :class="isCurrent ? 'shadow-lg' : ''"
+    @mouseover="mouseOver"
+    @mouseout="mouseOut"
   >
     <div class="bg-grey-lighter flex items-center justify-between leading-tight p-2 md:p-4">
+      <div
+        class="absolute pin-t pin-r"
+        v-show="active"
+        @click="remove"
+      >
+        <i class="material-icons text-red-light text-2xl">
+          close
+        </i>
+      </div>
 
       <h1 class="text-xl">{{ project.name }}</h1>
     </div>
@@ -31,6 +42,12 @@
 
     props: ['project'],
 
+    data () {
+      return {
+        active: null
+      }
+    },
+
     computed: {
       ...mapGetters({
         current: 'projects/current',
@@ -47,6 +64,20 @@
         if (!this.isWorking) {
           this.$store.commit('projects/SET_CURRENT', this.project._id)
         }
+      },
+
+      remove () {
+        if (!this.isWorking) {
+          this.$store.dispatch('projects/delete', this.project._id)
+        }
+      },
+
+      mouseOver () {
+        this.active = true
+      },
+
+      mouseOut () {
+        this.active = null
       }
     }
   }
