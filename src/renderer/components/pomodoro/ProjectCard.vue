@@ -45,7 +45,7 @@
     methods: {
       select () {
         if (!this.isWorking) {
-          this.$store.commit('projects/TOGGLE', this.project._id)
+          this.$store.commit('projects/SET_CURRENT', this.project._id)
         }
       }
     }

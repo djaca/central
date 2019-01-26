@@ -17,7 +17,10 @@ const state = {
       name: 'goodwork'
     }
   ],
-  current: {}
+  current: {
+    _id: 1,
+    name: 'No project specified'
+  }
 }
 
 const getters = {
@@ -25,13 +28,7 @@ const getters = {
 }
 
 const mutations = {
-  TOGGLE (state, id) {
-    if (state.current._id === id) {
-      state.current = {}
-
-      return
-    }
-
+  SET_CURRENT (state, id) {
     state.current = state.items.find(i => i._id === id)
   }
 }
