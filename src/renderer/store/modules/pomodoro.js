@@ -5,7 +5,8 @@ import format from 'date-fns/format'
 
 const today = format(new Date(), 'MM-DD-YYYY')
 
-let sessionDuration = config.get('pomodoro.sessionDuration') || 25
+let sessionDuration = 0.1
+// let sessionDuration = config.get('pomodoro.sessionDuration') || 25
 let shortBreak = config.get('pomodoro.shortBreak') || 5
 let longBreak = config.get('pomodoro.longBreak') || 15
 let longBreakInterval = config.get('pomodoro.longBreakInterval') || 3
@@ -14,7 +15,7 @@ const state = {
   timer: null,
   isBreak: false,
   isSession: false,
-  time: sessionDuration * 60,
+  time: sessionDuration * 30,
   sessionDuration,
   shortBreak,
   longBreak,
@@ -31,7 +32,7 @@ const getters = {
 
   isActive: state => !!state.timer,
 
-  sessionCount: state => state.workSession ? state.workSession.count : null,
+  sessionCount: state => state.workSession ? state.workSession.data.length : null,
 
   onBreak: state => state.isBreak,
 
@@ -66,8 +67,8 @@ const mutations = {
     state.time--
   },
 
-  INCREMENT_WORK_SESSION (state) {
-    state.workSession.count++
+  INCREMENT_WORK_SESSION (state, payload) {
+    state.workSession.data.push(payload)
   },
 
   RESET (state) {
@@ -116,8 +117,13 @@ const actions = {
     commit('SET_TIMER', timer)
   },
 
-  endSession ({commit, state}) {
-    db.pomodoro.update({ _id: state.workSession._id }, { $set: { count: state.workSession.count + 1 } }, err => {
+  endSession ({commit, state, rootGetters}) {
+    let data = {
+      project: rootGetters['projects/current'].name || 'Unspecified project',
+      duration: state.sessionDuration
+    }
+
+    db.pomodoro.update({ _id: state.workSession._id }, { $push: { data } }, err => {
       if (err) {
         console.log(err)
 
@@ -126,7 +132,7 @@ const actions = {
 
       commit('RESET')
 
-      commit('INCREMENT_WORK_SESSION')
+      commit('INCREMENT_WORK_SESSION', data)
 
       commit('SET_FINISH', true)
     })
@@ -165,10 +171,7 @@ const actions = {
       }
 
       if (!doc) {
-        db.pomodoro.insert({
-          date: today,
-          count: 0
-        }, (err, newDoc) => {
+        db.pomodoro.insert({ date: today, data: [] }, (err, newDoc) => {
           if (err) {
             console.log(err)
             return
