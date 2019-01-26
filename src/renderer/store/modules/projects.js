@@ -4,13 +4,13 @@ const remoteProjects = db.projects
 
 const state = {
   items: null,
-  current: null
+  currentId: null
 }
 
 const getters = {
   projects: state => state.items,
 
-  current: state => state.current ? state.current : {}
+  current: state => state.currentId ? state.items.find(i => i._id === state.currentId) : {}
 }
 
 const mutations = {
@@ -19,7 +19,7 @@ const mutations = {
   },
 
   SET_CURRENT (state, id) {
-    state.current = state.items.find(i => i._id === id)
+    state.currentId = id
   },
 
   ADD (state, payload) {
@@ -33,8 +33,9 @@ const mutations = {
   DELETE (state, id) {
     state.items.splice(state.items.findIndex(i => i._id === id), 1)
 
-    if (state.current._id === id) {
-      state.current = null
+    // Unselect project
+    if (state.currentId === id) {
+      state.currentId = null
     }
   }
 }
