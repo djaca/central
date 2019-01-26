@@ -8,7 +8,7 @@ const state = {
 }
 
 const getters = {
-  projects: state => state.items,
+  projects: state => state.items ? [...state.items].sort((a, b) => b.createdAt - a.createdAt) : [],
 
   current: state => state.currentId ? state.items.find(i => i._id === state.currentId) : {}
 }
@@ -54,7 +54,10 @@ const actions = {
   },
 
   add ({commit}, name) {
-    let data = {name}
+    let data = {
+      name,
+      createdAt: new Date()
+    }
 
     remoteProjects.insert(data, (err, newDoc) => {
       if (err) {

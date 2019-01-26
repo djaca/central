@@ -47,7 +47,7 @@
     },
 
     mounted () {
-      if (!this.projects) {
+      if (this.projects.length < 1) {
         this.$store.dispatch('projects/get')
       }
     }
