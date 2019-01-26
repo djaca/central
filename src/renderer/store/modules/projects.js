@@ -24,6 +24,14 @@ const mutations = {
 
   ADD (state, payload) {
     state.items.push(payload)
+  },
+
+  DELETE (state, id) {
+    state.items.splice(state.items.findIndex(i => i._id === id), 1)
+
+    if (state.current._id === id) {
+      state.current = {}
+    }
   }
 }
 
@@ -55,7 +63,15 @@ const actions = {
   },
 
   delete ({commit}, id) {
-    console.log(id)
+    remoteProjects.remove({ _id: id }, {}, (err, numRemoved) => {
+      if (err) {
+        console.log(err)
+
+        return
+      }
+
+      commit('DELETE', id)
+    })
   }
 }
 

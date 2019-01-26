@@ -67,9 +67,31 @@
       },
 
       remove () {
-        if (!this.isWorking) {
-          this.$store.dispatch('projects/delete', this.project._id)
+        if (this.isWorking) {
+          this.$swal.fire({
+            toast: true,
+            position: 'top',
+            title: 'Can`t delete at this moment. Finish working session!',
+            type: 'error',
+            timer: 3000,
+            showConfirmButton: false
+          })
+
+          return
         }
+
+        this.$swal.fire({
+          title: `Are you sure?`,
+          type: 'question',
+          allowEscapeKey: false,
+          showCancelButton: true,
+          confirmButtonText: 'Yes!',
+          cancelButtonText: 'No'
+        }).then(({value}) => {
+          if (value) {
+            this.$store.dispatch('projects/delete', this.project._id)
+          }
+        })
       },
 
       mouseOver () {
