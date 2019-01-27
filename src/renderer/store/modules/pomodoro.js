@@ -5,21 +5,15 @@ import {find, create, update} from '@/database/sessions'
 
 const today = format(new Date(), 'MM-DD-YYYY')
 
-let sessionDuration = 0.1
-// let sessionDuration = config.get('pomodoro.sessionDuration') || 25
-let shortBreak = config.get('pomodoro.shortBreak') || 5
-let longBreak = config.get('pomodoro.longBreak') || 15
-let longBreakInterval = config.get('pomodoro.longBreakInterval') || 3
-
 const state = {
   timer: null,
   isBreak: false,
   isSession: false,
-  time: sessionDuration * 30,
-  sessionDuration,
-  shortBreak,
-  longBreak,
-  longBreakInterval,
+  time: null,
+  sessionDuration: config.get('pomodoro.sessionDuration') || 25,
+  shortBreak: config.get('pomodoro.shortBreak') || 5,
+  longBreak: config.get('pomodoro.longBreak') || 15,
+  longBreakInterval: config.get('pomodoro.longBreakInterval') || 3,
   workSession: null,
   isWorkFinished: false,
   isUserClicked: false

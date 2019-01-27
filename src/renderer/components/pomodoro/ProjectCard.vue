@@ -26,8 +26,8 @@
       <div class="text-sm">
         <ul class="list-reset">
           <li><b>Work sessions completed today: </b>{{ sessionsCount }}</li>
-          <li><b>Total work sessions completed: </b>{{ project.sessions }}</li>
-          <li><b>Time spent: </b>{{ project.time }} 47h 24m</li>
+          <li><b>Total work sessions: </b>{{ project.sessions }}</li>
+          <li><b>Time total: </b>{{ project.time }}</li>
         </ul>
       </div>
     </div>

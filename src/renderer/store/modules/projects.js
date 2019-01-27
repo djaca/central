@@ -1,4 +1,5 @@
 import { create, getAll, remove, update } from '@/database/projects'
+import {sec2time} from '@/utilities/helpers'
 
 const state = {
   items: null,
@@ -6,7 +7,16 @@ const state = {
 }
 
 const getters = {
-  projects: state => state.items ? [...state.items].sort((a, b) => b.createdAt - a.createdAt) : [],
+  projects: state => {
+    return state.items
+      ? [...state.items].sort((a, b) => b.createdAt - a.createdAt).map(i => {
+        return {
+          ...i,
+          time: sec2time(i.time)
+        }
+      })
+      : []
+  },
 
   current: state => state.currentId ? state.items.find(i => i._id === state.currentId) : {}
 }
@@ -35,6 +45,14 @@ const mutations = {
     if (state.currentId === id) {
       state.currentId = null
     }
+  },
+
+  INCREMENT_SESSION (state, duration) {
+    let i = state.items.find(i => i._id === state.currentId)
+
+    i.sessions++
+
+    i.time += duration
   }
 }
 
@@ -64,13 +82,16 @@ const actions = {
   },
 
   async incrementSession ({commit, state, getters, dispatch}, duration) {
-    // from now on, store durations in seconds...
-    // todo: later change in pomodoro...
-    duration = 15 * 60 // temp
+    duration *= 60 // store in seconds
 
-    await update({ _id: state.currentId }, {$set: {sessions: getters.current.sessions + 1, time: getters.current.time + duration}})
+    let data = {
+      sessions: getters.current.sessions + 1,
+      time: getters.current.time + duration
+    }
 
-    console.log('commit increment and time')
+    await update({ _id: state.currentId }, {$set: data})
+
+    commit('INCREMENT_SESSION', duration)
   }
 }
 
