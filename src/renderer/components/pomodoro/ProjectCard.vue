@@ -25,8 +25,9 @@
     <div class="flex items-center justify-between leading-none p-2 md:p-4">
       <div class="text-sm">
         <ul class="list-reset">
-          <li class="mb-2"><b>Time spent:</b> 47h 24m</li>
-          <li><b>Work sessions completed today:</b> {{ sessionsCount }}</li>
+          <li><b>Work sessions completed today: </b>{{ sessionsCount }}</li>
+          <li><b>Total work sessions completed: </b>{{ project.sessions }}</li>
+          <li><b>Time spent: </b>{{ project.time }} 47h 24m</li>
         </ul>
       </div>
     </div>
@@ -118,3 +119,9 @@
     }
   }
 </script>
+
+<style scoped>
+  ul li {
+    margin-bottom: 1rem;
+  }
+</style>

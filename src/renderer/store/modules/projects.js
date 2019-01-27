@@ -46,7 +46,7 @@ const actions = {
   },
 
   async add ({commit}, name) {
-    const data = await create({name, createdAt: new Date()})
+    const data = await create({name, createdAt: new Date(), sessions: 0, time: 0})
 
     commit('ADD', data)
   },
@@ -61,6 +61,16 @@ const actions = {
     await remove({_id: id})
 
     commit('DELETE', id)
+  },
+
+  async incrementSession ({commit, state, getters, dispatch}, duration) {
+    // from now on, store durations in seconds...
+    // todo: later change in pomodoro...
+    duration = 15 * 60 // temp
+
+    await update({ _id: state.currentId }, {$set: {sessions: getters.current.sessions + 1, time: getters.current.time + duration}})
+
+    console.log('commit increment and time')
   }
 }
 

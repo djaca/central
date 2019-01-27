@@ -34,7 +34,7 @@ const getters = {
 
   sessionCount: state => state.workSession ? state.workSession.data.length : null,
 
-  sessions: state => state.workSession ? state.workSession.data : null,
+  sessions: state => state.workSession ? state.workSession.data : [],
 
   onBreak: state => state.isBreak,
 
@@ -119,7 +119,7 @@ const actions = {
     commit('SET_TIMER', timer)
   },
 
-  async endSession ({commit, state, rootGetters}) {
+  async endSession ({commit, state, dispatch, rootGetters}) {
     let data = {
       project: rootGetters['projects/current'].name || 'Unspecified project',
       duration: state.sessionDuration
@@ -130,6 +130,8 @@ const actions = {
     commit('RESET')
 
     commit('INCREMENT_WORK_SESSION', data)
+
+    dispatch('projects/incrementSession', state.sessionDuration, { root: true })
 
     commit('SET_FINISH', true)
   },
