@@ -34,6 +34,8 @@ const getters = {
 
   sessionCount: state => state.workSession ? state.workSession.data.length : null,
 
+  sessions: state => state.workSession ? state.workSession.data : null,
+
   onBreak: state => state.isBreak,
 
   sessionFinished: state => state.isWorkFinished,

@@ -24,7 +24,10 @@
 
     <div class="flex items-center justify-between leading-none p-2 md:p-4">
       <div class="text-sm">
-        <b>Time spent:</b> 47h 24m
+        <ul class="list-reset">
+          <li class="mb-2"><b>Time spent:</b> 47h 24m</li>
+          <li><b>Work sessions completed today:</b> {{ sessionsCount }}</li>
+        </ul>
       </div>
     </div>
 
@@ -53,8 +56,13 @@
     computed: {
       ...mapGetters({
         current: 'projects/current',
-        isWorking: 'pomodoro/isWorking'
+        isWorking: 'pomodoro/isWorking',
+        sessions: 'pomodoro/sessions'
       }),
+
+      sessionsCount () {
+        return this.sessions.filter(s => s.project === this.project.name).length
+      },
 
       isCurrent () {
         return this.current._id === this.project._id
