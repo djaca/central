@@ -34,6 +34,8 @@
 </template>
 
 <script>
+  import {mapGetters} from 'vuex'
+
   export default {
     name: 'ProjectForm',
 
@@ -41,34 +43,84 @@
 
     data () {
       return {
-        name: ''
+        name: null
       }
+    },
+
+    computed: {
+      ...mapGetters('projects', ['projects'])
     },
 
     methods: {
       save () {
-        if (this.name !== '') {
-          if (this.project) {
-            this.$store.dispatch('projects/update', {id: this.project._id, name: this.name})
-          } else {
-            this.$store.dispatch('projects/add', this.name)
-          }
+        if (!this.name) {
+          this.notify('Name is required!', 'warning')
 
+          return
+        }
+
+        if (this.project) {
+          this.update()
+
+          return
+        }
+
+        this.add()
+      },
+
+      add () {
+        if (this.projects.some(p => p.name === this.name)) {
+          this.projectExistsNotification()
+
+          return
+        }
+
+        this.$store.dispatch('projects/add', this.name)
+
+        this.notify('Project successfully created!')
+
+        this.$emit('close')
+      },
+
+      update () {
+        if (this.projects.filter(p => p._id !== this.project._id).some(p => p.name === this.name)) {
+          this.projectExistsNotification()
+
+          return
+        }
+
+        if (this.name === this.project.name) {
           this.$emit('close')
+
+          return
+        }
+
+        this.$store.dispatch('projects/update', {id: this.project._id, name: this.name})
+
+        this.notify('Project successfully updated!')
+
+        this.$emit('close')
+      },
+
+      projectExistsNotification () {
+        this.notify('Project with that name already exists!', 'warning')
+      },
+
+      notify (title, type = 'success') {
+        this.$toast.fire({title, type})
+
+        if (type === 'warning') {
+          this.$refs.name.focus()
         }
       }
     },
 
     mounted () {
-      this.$refs.name.focus()
-
       if (this.project) {
         this.name = this.project.name
       }
+
+      this.$refs.name.focus()
     }
   }
 </script>
-
-<style scoped>
-
-</style>
