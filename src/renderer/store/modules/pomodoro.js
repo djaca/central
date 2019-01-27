@@ -1,7 +1,7 @@
 import {padZero} from '@/utilities/helpers'
 import config from '@/config'
-import db from '@/database'
 import format from 'date-fns/format'
+import {find, create, update} from '@/database/sessions'
 
 const today = format(new Date(), 'MM-DD-YYYY')
 
@@ -117,25 +117,19 @@ const actions = {
     commit('SET_TIMER', timer)
   },
 
-  endSession ({commit, state, rootGetters}) {
+  async endSession ({commit, state, rootGetters}) {
     let data = {
       project: rootGetters['projects/current'].name || 'Unspecified project',
       duration: state.sessionDuration
     }
 
-    db.pomodoro.update({ _id: state.workSession._id }, { $push: { data } }, err => {
-      if (err) {
-        console.log(err)
+    await update({ _id: state.workSession._id }, { $push: { data } })
 
-        return
-      }
+    commit('RESET')
 
-      commit('RESET')
+    commit('INCREMENT_WORK_SESSION', data)
 
-      commit('INCREMENT_WORK_SESSION', data)
-
-      commit('SET_FINISH', true)
-    })
+    commit('SET_FINISH', true)
   },
 
   initSession ({ commit, state, dispatch }) {
@@ -162,29 +156,14 @@ const actions = {
     commit('RESET')
   },
 
-  getTodayWorkSessionCount ({commit}) {
-    db.pomodoro.findOne({ date: today }, (err, doc) => {
-      if (err) {
-        console.log(err)
+  async getTodayWorkSessionCount ({commit}) {
+    let todaySessions = await find({ date: today })
 
-        return
-      }
+    if (!todaySessions) {
+      todaySessions = await create({ date: today, data: [] })
+    }
 
-      if (!doc) {
-        db.pomodoro.insert({ date: today, data: [] }, (err, newDoc) => {
-          if (err) {
-            console.log(err)
-            return
-          }
-
-          commit('SET_WORK_SESSION', newDoc)
-        })
-
-        return
-      }
-
-      commit('SET_WORK_SESSION', doc)
-    })
+    commit('SET_WORK_SESSION', todaySessions)
   }
 }
 

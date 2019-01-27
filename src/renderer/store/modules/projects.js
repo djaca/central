@@ -1,6 +1,4 @@
-import db from '@/database'
-
-const remoteProjects = db.projects
+import { create, getAll, remove, update } from '@/database/projects'
 
 const state = {
   items: null,
@@ -41,55 +39,28 @@ const mutations = {
 }
 
 const actions = {
-  get ({commit}) {
-    remoteProjects.find({}, (err, docs) => {
-      if (err) {
-        console.log(err)
+  async get ({commit}) {
+    const data = await getAll()
 
-        return
-      }
-
-      commit('SET_PROJECTS', docs)
-    })
+    commit('SET_PROJECTS', data)
   },
 
-  add ({commit}, name) {
-    let data = {
-      name,
-      createdAt: new Date()
-    }
+  async add ({commit}, name) {
+    const data = await create({name, createdAt: new Date()})
 
-    remoteProjects.insert(data, (err, newDoc) => {
-      if (err) {
-        console.log(err)
-
-        return
-      }
-
-      commit('ADD', newDoc)
-    })
+    commit('ADD', data)
   },
 
-  update ({commit}, payload) {
-    remoteProjects.update({ _id: payload.id }, { $set: { name: payload.name } }, err => {
-      if (err) {
-        console.log(err)
-      }
+  async update ({commit}, payload) {
+    await update({_id: payload.id}, {$set: {name: payload.name}})
 
-      commit('UPDATE', payload)
-    })
+    commit('UPDATE', payload)
   },
 
-  delete ({commit}, id) {
-    remoteProjects.remove({ _id: id }, {}, (err, numRemoved) => {
-      if (err) {
-        console.log(err)
+  async delete ({commit}, id) {
+    await remove({_id: id})
 
-        return
-      }
-
-      commit('DELETE', id)
-    })
+    commit('DELETE', id)
   }
 }
 

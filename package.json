@@ -29,6 +29,7 @@
     "electron-log": "^3.0.0-beta2",
     "electron-store": "^2.0.0",
     "nedb": "^1.8.0",
+    "nedb-promise": "^2.0.1",
     "sweetalert2": "^8.0.1",
     "vue": "^2.5.16",
     "vue-countable": "^1.0.7",
