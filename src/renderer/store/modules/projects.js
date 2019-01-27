@@ -82,16 +82,19 @@ const actions = {
   },
 
   async incrementSession ({commit, state, getters, dispatch}, duration) {
-    duration *= 60 // store in seconds
+    // for now, increment only if project is selected...
+    if (state.currentId) {
+      duration *= 60 // store in seconds
 
-    let data = {
-      sessions: getters.current.sessions + 1,
-      time: getters.current.time + duration
+      let data = {
+        sessions: getters.current.sessions + 1,
+        time: getters.current.time + duration
+      }
+
+      await update({ _id: state.currentId }, {$set: data})
+
+      commit('INCREMENT_SESSION', duration)
     }
-
-    await update({ _id: state.currentId }, {$set: data})
-
-    commit('INCREMENT_SESSION', duration)
   }
 }
 
