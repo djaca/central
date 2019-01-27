@@ -44,12 +44,6 @@
 
         this.$modal.show(ProjectForm, {project})
       }
-    },
-
-    mounted () {
-      if (this.projects.length < 1) {
-        this.$store.dispatch('projects/get')
-      }
     }
   }
 </script>
