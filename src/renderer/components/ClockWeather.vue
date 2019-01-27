@@ -109,7 +109,7 @@
     mounted () {
       this.$store.dispatch('clock/init')
 
-      this.getWeather()
+      // this.getWeather()
     },
 
     beforeDestroy () {
