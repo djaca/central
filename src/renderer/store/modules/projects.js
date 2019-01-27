@@ -2,8 +2,9 @@ import { create, getAll, remove, update } from '@/database/projects'
 import {sec2time} from '@/utilities/helpers'
 
 const state = {
-  items: null,
-  currentId: null
+  items: [],
+  currentId: null,
+  unspecified: {}
 }
 
 const getters = {
@@ -18,7 +19,9 @@ const getters = {
       : []
   },
 
-  current: state => state.currentId ? state.items.find(i => i._id === state.currentId) : {}
+  current: state => state.currentId ? state.items.find(i => i._id === state.currentId) : {},
+
+  unspecified: state => state.unspecified
 }
 
 const mutations = {
@@ -41,9 +44,8 @@ const mutations = {
   DELETE (state, id) {
     state.items.splice(state.items.findIndex(i => i._id === id), 1)
 
-    // Unselect project
     if (state.currentId === id) {
-      state.currentId = null
+      state.currentId = state.unspecified._id
     }
   },
 
@@ -53,14 +55,32 @@ const mutations = {
     i.sessions++
 
     i.time += duration
+  },
+
+  SET_UNSPECIFIED (state, payload) {
+    state.unspecified = payload
   }
 }
 
 const actions = {
-  async get ({commit}) {
-    const data = await getAll()
+  async get ({commit, dispatch}) {
+    let projects = await getAll()
 
-    commit('SET_PROJECTS', data)
+    commit('SET_PROJECTS', projects)
+
+    dispatch('handleUnspecifiedProject')
+  },
+
+  async handleUnspecifiedProject ({commit, state, dispatch}) {
+    if (state.items.length < 1) {
+      await dispatch('add', 'Unspecified project')
+    }
+
+    const unspecifiedProject = state.items.find(d => d.name === 'Unspecified project')
+
+    commit('SET_UNSPECIFIED', unspecifiedProject)
+
+    commit('SET_CURRENT', unspecifiedProject._id)
   },
 
   async add ({commit}, name) {
@@ -82,19 +102,16 @@ const actions = {
   },
 
   async incrementSession ({commit, state, getters, dispatch}, duration) {
-    // for now, increment only if project is selected...
-    if (state.currentId) {
-      duration *= 60 // store in seconds
+    duration *= 60 // store in seconds
 
-      let data = {
-        sessions: getters.current.sessions + 1,
-        time: getters.current.time + duration
-      }
-
-      await update({ _id: state.currentId }, {$set: data})
-
-      commit('INCREMENT_SESSION', duration)
+    let data = {
+      sessions: getters.current.sessions + 1,
+      time: getters.current.time + duration
     }
+
+    await update({ _id: state.currentId }, {$set: data})
+
+    commit('INCREMENT_SESSION', duration)
   }
 }
 

@@ -115,7 +115,7 @@ const actions = {
 
   async endSession ({commit, state, dispatch, rootGetters}) {
     let data = {
-      project: rootGetters['projects/current'].name || 'Unspecified project',
+      project: rootGetters['projects/current'].name,
       duration: state.sessionDuration
     }
 

@@ -2,24 +2,24 @@
   <div
     class="overflow-hidden rounded-lg shadow-md hover:shadow-lg cursor-pointer bg-white relative"
     @click="select"
-    :class="isCurrent ? 'shadow-lg' : ''"
+    :class="[isCurrent ? 'shadow-lg' : '']"
     @mouseover="mouseOver"
     @mouseout="mouseOut"
   >
     <div class="bg-grey-lighter flex items-center justify-between leading-tight p-2 md:p-4">
       <div
         class="absolute pin-t pin-r"
-        v-show="active"
+        v-show="active && !isUnspecified"
       >
-        <i class="material-icons text-blue text-2xl" @click="edit">
+        <i class="material-icons text-blue text-2xl" @click.stop="edit">
           edit
         </i>
-        <i class="material-icons text-red-light text-2xl" @click="remove">
+        <i class="material-icons text-red-light text-2xl" @click.stop="remove">
           close
         </i>
       </div>
 
-      <h1 class="text-xl">{{ project.name }}</h1>
+      <h1 class="text-xl" :class="isUnspecified ? 'text-grey-dark italic' : ''">{{ project.name }}</h1>
     </div>
 
     <div class="flex items-center justify-between leading-none p-2 md:p-4">
@@ -58,7 +58,8 @@
       ...mapGetters({
         current: 'projects/current',
         isWorking: 'pomodoro/isWorking',
-        sessions: 'pomodoro/sessions'
+        sessions: 'pomodoro/sessions',
+        unspecified: 'projects/unspecified'
       }),
 
       sessionsCount () {
@@ -67,6 +68,10 @@
 
       isCurrent () {
         return this.current._id === this.project._id
+      },
+
+      isUnspecified () {
+        return this.project._id === this.unspecified._id
       }
     },
 
