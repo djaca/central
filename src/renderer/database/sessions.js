@@ -6,8 +6,8 @@ const db = datastore({
   autoload: true
 })
 
-export function find (data) {
-  return db.findOne(data)
+export function getForDate (date) {
+  return db.find({date})
 }
 
 export function create (data) {

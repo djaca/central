@@ -1,7 +1,7 @@
 import {padZero} from '@/utilities/helpers'
 import config from '@/config'
 import format from 'date-fns/format'
-import {find, create, update} from '@/database/sessions'
+import {getForDate, create} from '@/database/sessions'
 
 const today = format(new Date(), 'MM-DD-YYYY')
 
@@ -14,9 +14,8 @@ const state = {
   shortBreak: config.get('pomodoro.shortBreak') || 0.1,
   longBreak: config.get('pomodoro.longBreak') || 0.2,
   longBreakInterval: config.get('pomodoro.longBreakInterval') || 3,
-  workSession: null,
-  isWorkFinished: false,
-  isUserClicked: false
+  todaySessions: [],
+  isWorkFinished: false
 }
 
 const getters = {
@@ -26,9 +25,9 @@ const getters = {
 
   isActive: state => !!state.timer,
 
-  sessionCount: state => state.workSession ? state.workSession.data.length : null,
+  sessionCount: state => state.todaySessions.length,
 
-  sessions: state => state.workSession ? state.workSession.data : [],
+  sessions: state => state.todaySessions,
 
   onBreak: state => state.isBreak,
 
@@ -64,7 +63,7 @@ const mutations = {
   },
 
   INCREMENT_WORK_SESSION (state, payload) {
-    state.workSession.data.push(payload)
+    state.todaySessions.push(payload)
   },
 
   RESET (state) {
@@ -86,7 +85,7 @@ const mutations = {
   },
 
   SET_WORK_SESSION (state, payload) {
-    state.workSession = payload
+    state.todaySessions = payload
   },
 
   SET_FINISH (state, payload) {
@@ -115,11 +114,12 @@ const actions = {
 
   async endSession ({commit, state, dispatch, rootGetters}) {
     let data = {
-      project: rootGetters['projects/current']._id,
+      date: today,
+      project: rootGetters['projects/current'].name,
       duration: state.sessionDuration
     }
 
-    await update({ _id: state.workSession._id }, { $push: { data } })
+    await create(data)
 
     commit('RESET')
 
@@ -155,11 +155,7 @@ const actions = {
   },
 
   async getTodayWorkSessionCount ({commit}) {
-    let todaySessions = await find({ date: today })
-
-    if (!todaySessions) {
-      todaySessions = await create({ date: today, data: [] })
-    }
+    let todaySessions = await getForDate(today)
 
     commit('SET_WORK_SESSION', todaySessions)
   }
