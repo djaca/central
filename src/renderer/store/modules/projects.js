@@ -102,6 +102,15 @@ const actions = {
     commit('UPDATE', payload)
   },
 
+  updateName ({commit, state, dispatch}, payload) {
+    dispatch('update', payload)
+
+    dispatch('pomodoro/replaceProjectName', {
+      oldName: state.items.find(i => i._id === payload.id).name,
+      newName: payload.data.name
+    }, {root: true})
+  },
+
   async delete ({commit, state, dispatch}, id) {
     let deletedProject = state.items.find(i => i._id === id)
 
@@ -114,13 +123,16 @@ const actions = {
     dispatch('update', {id: state.unspecified._id, data})
 
     // Replace deleted name with unspecified project
-    dispatch('pomodoro/replaceProjectName', deletedProject.name, {root: true})
+    dispatch('pomodoro/replaceProjectName', {
+      oldName: deletedProject.name,
+      newName: state.unspecified.name
+    }, {root: true})
 
     await remove({_id: id})
     commit('DELETE', id)
   },
 
-  async incrementSession ({commit, state, getters, dispatch}, duration) {
+  incrementSession ({commit, state, getters, dispatch}, duration) {
     duration *= 60 // store in seconds
 
     let data = {

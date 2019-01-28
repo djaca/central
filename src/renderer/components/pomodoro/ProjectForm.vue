@@ -95,7 +95,7 @@
           return
         }
 
-        this.$store.dispatch('projects/update', {id: this.project._id, data: {name: this.name}})
+        this.$store.dispatch('projects/updateName', {id: this.project._id, data: {name: this.name}})
 
         this.notify('Project successfully updated!')
 

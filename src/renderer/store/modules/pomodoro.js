@@ -160,8 +160,8 @@ const actions = {
     commit('SET_WORK_SESSION', todaySessions)
   },
 
-  async replaceProjectName ({commit, rootGetters, dispatch}, name) {
-    await update({project: name}, { $set: {project: rootGetters['projects/unspecified'].name} }, {multi: true})
+  async replaceProjectName ({commit, rootGetters, dispatch}, {oldName, newName}) {
+    await update({project: oldName}, { $set: { project: newName } }, {multi: true})
 
     dispatch('getTodayWorkSessionCount')
   }
