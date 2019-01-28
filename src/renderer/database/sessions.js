@@ -14,6 +14,6 @@ export function create (data) {
   return db.insert(data)
 }
 
-export function update (query, update) {
-  return db.update(query, update)
+export function update (query, update, options = {multi: false}) {
+  return db.update(query, update, options)
 }

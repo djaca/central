@@ -110,7 +110,11 @@ const actions = {
       time: state.unspecified.time + deletedProject.time
     }
 
+    // Transfer data to unspecified project
     dispatch('update', {id: state.unspecified._id, data})
+
+    // Replace deleted name with unspecified project
+    dispatch('pomodoro/replaceProjectName', deletedProject.name, {root: true})
 
     await remove({_id: id})
     commit('DELETE', id)

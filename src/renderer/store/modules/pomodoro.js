@@ -1,7 +1,7 @@
 import {padZero} from '@/utilities/helpers'
 import config from '@/config'
 import format from 'date-fns/format'
-import {getForDate, create} from '@/database/sessions'
+import {getForDate, create, update} from '@/database/sessions'
 
 const today = format(new Date(), 'MM-DD-YYYY')
 
@@ -158,6 +158,12 @@ const actions = {
     let todaySessions = await getForDate(today)
 
     commit('SET_WORK_SESSION', todaySessions)
+  },
+
+  async replaceProjectName ({commit, rootGetters, dispatch}, name) {
+    await update({project: name}, { $set: {project: rootGetters['projects/unspecified'].name} }, {multi: true})
+
+    dispatch('getTodayWorkSessionCount')
   }
 }
 
