@@ -1,5 +1,6 @@
 import { create, getAll, remove, update } from '@/database/projects'
 import {sec2time} from '@/utilities/helpers'
+import Vue from 'vue'
 
 const state = {
   items: [],
@@ -38,12 +39,13 @@ const mutations = {
   },
 
   UPDATE (state, payload) {
-    state.items.find(i => i._id === payload.id).name = payload.name
-  },
+    let index = state.items.findIndex(i => i._id === payload.id)
 
-  UPDATE_UNSPECIFIED (state, payload) {
-    state.unspecified.sessions = payload.sessions
-    state.unspecified.time = payload.time
+    Vue.set(
+      state.items,
+      index,
+      {...state.items[index], ...payload.data}
+    )
   },
 
   DELETE (state, id) {
@@ -95,12 +97,12 @@ const actions = {
   },
 
   async update ({commit}, payload) {
-    await update({_id: payload.id}, {$set: {name: payload.name}})
+    await update({_id: payload.id}, {$set: payload.data})
 
     commit('UPDATE', payload)
   },
 
-  async delete ({commit, state}, id) {
+  async delete ({commit, state, dispatch}, id) {
     let deletedProject = state.items.find(i => i._id === id)
 
     let data = {
@@ -108,8 +110,7 @@ const actions = {
       time: state.unspecified.time + deletedProject.time
     }
 
-    await update({ _id: state.unspecified._id }, {$set: data})
-    commit('UPDATE_UNSPECIFIED', data)
+    dispatch('update', {id: state.unspecified._id, data})
 
     await remove({_id: id})
     commit('DELETE', id)
@@ -123,7 +124,7 @@ const actions = {
       time: getters.current.time + duration
     }
 
-    await update({ _id: state.currentId }, {$set: data})
+    dispatch('update', {id: state.currentId, data})
 
     commit('INCREMENT_SESSION', duration)
   }
