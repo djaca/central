@@ -41,6 +41,11 @@ const mutations = {
     state.items.find(i => i._id === payload.id).name = payload.name
   },
 
+  UPDATE_UNSPECIFIED (state, payload) {
+    state.unspecified.sessions = payload.sessions
+    state.unspecified.time = payload.time
+  },
+
   DELETE (state, id) {
     state.items.splice(state.items.findIndex(i => i._id === id), 1)
 
@@ -95,9 +100,18 @@ const actions = {
     commit('UPDATE', payload)
   },
 
-  async delete ({commit}, id) {
-    await remove({_id: id})
+  async delete ({commit, state}, id) {
+    let deletedProject = state.items.find(i => i._id === id)
 
+    let data = {
+      sessions: state.unspecified.sessions + deletedProject.sessions,
+      time: state.unspecified.time + deletedProject.time
+    }
+
+    await update({ _id: state.unspecified._id }, {$set: data})
+    commit('UPDATE_UNSPECIFIED', data)
+
+    await remove({_id: id})
     commit('DELETE', id)
   },
 
