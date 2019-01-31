@@ -40,6 +40,7 @@
 
 <script>
   import { mapGetters } from 'vuex'
+  const audio = new Audio(require('../../assets/ship-bell.wav'))
 
   export default {
     name: 'Timer',
@@ -51,6 +52,7 @@
     watch: {
       sessionFinished (val) {
         if (val) {
+          audio.play()
           this.openBreakDialog()
         }
       },
@@ -122,6 +124,8 @@
           title: 'Break complete. Now, get to work!',
           type: 'warning'
         })
+
+        audio.play()
       }
     }
   }
