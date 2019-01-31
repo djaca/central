@@ -19,7 +19,8 @@ const state = {
   longBreak,
   longBreakInterval,
   workSession: null,
-  isWorkFinished: false
+  isWorkFinished: false,
+  isUserClicked: false
 }
 
 const getters = {
@@ -84,6 +85,10 @@ const mutations = {
 
   SET_FINISH (state, payload) {
     state.isWorkFinished = payload
+  },
+
+  SET_USER_CLICKED (state, payload) {
+    state.isUserClicked = payload
   }
 }
 

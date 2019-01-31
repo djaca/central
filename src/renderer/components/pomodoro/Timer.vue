@@ -53,12 +53,24 @@
         if (val) {
           this.openBreakDialog()
         }
+      },
+
+      onBreak (val) {
+        if (!val && !this.$store.state.pomodoro.isUserClicked) {
+          this.openBreakFinishedDialog()
+
+          return
+        }
+
+        this.$store.commit('pomodoro/SET_USER_CLICKED', false)
       }
     },
 
     methods: {
       skipBreak () {
         this.$store.dispatch('pomodoro/endBreak')
+
+        this.$store.commit('pomodoro/SET_USER_CLICKED', true)
       },
 
       action () {
@@ -102,6 +114,13 @@
           }
 
           this.$store.commit('pomodoro/RESET')
+        })
+      },
+
+      openBreakFinishedDialog () {
+        this.$toast.fire({
+          title: 'Break complete. Now, get to work!',
+          type: 'warning'
         })
       }
     }
