@@ -3,7 +3,9 @@
     <sidebar></sidebar>
 
     <div class="flex-1">
-      <router-view></router-view>
+      <keep-alive>
+        <router-view></router-view>
+      </keep-alive>
     </div>
   </div>
 </template>
