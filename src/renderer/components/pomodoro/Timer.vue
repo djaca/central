@@ -120,6 +120,16 @@
       },
 
       openBreakFinishedDialog () {
+        if (!this.$electron.remote.getCurrentWindow().isFocused()) {
+          let notification = new window.Notification('Break complete', {
+            body: 'Now, get to work!'
+          })
+
+          notification.onclick = () => {
+            console.log('Notification clicked')
+          }
+        }
+
         this.$toast.fire({
           title: 'Break complete. Now, get to work!',
           type: 'warning'
