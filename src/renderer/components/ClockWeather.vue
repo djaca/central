@@ -2,20 +2,28 @@
   <div class="">
     <div class="flex justify-between items-end">
       <div class="datetime">
-        <div class="text-sm">{{ date }}</div>
+        <div class="text-sm" v-text="date"></div>
 
         <time class="text-5xl">
-          <span>{{ hours }}</span>
+          <span v-text="hours"></span>
           <span v-if="seconds % 2 === 0">:</span>
           <span v-else>&nbsp;</span>
-          <span>{{ minutes }}</span>
+          <span v-text="minutes"></span>
         </time>
       </div>
 
-      <img :src="icon" class="w-16 h-16" alt="weather" v-show="isActive">
+      <img
+        :src="icon"
+        class="w-16 h-16"
+        alt="weather"
+        v-show="isActive"
+      >
     </div>
 
-    <div class="flex justify-between items-start weather" v-show="isActive">
+    <div
+      class="flex justify-between items-start weather"
+      v-show="isActive"
+    >
       <div class="text-sm mt-2">
         <div>Humidity: {{ humidity }}</div>
         <div>Pressure: {{ pressure }}</div>
@@ -33,9 +41,14 @@
       </div>
     </div>
 
-    <div class="text-sm">{{ location }}</div>
+    <div class="text-sm" v-text="location"></div>
 
-    <button class="text-xs" @click="addCity">{{ location ? 'Edit' : 'Add'}} city</button>
+    <button
+      class="text-xs"
+      @click="addCity"
+    >
+      {{ location ? 'Edit' : 'Add' }} city
+    </button>
   </div>
 </template>
 
@@ -86,9 +99,7 @@
           input: 'text',
           showCancelButton: true,
           confirmButtonText: 'Add',
-          inputValidator: (value) => {
-            return !value && 'You need to write something!'
-          }
+          inputValidator: (value) => !value && 'You need to write something!'
         }
 
         if (this.location) {
@@ -109,11 +120,12 @@
     mounted () {
       this.$store.dispatch('clock/init')
 
-      // this.getWeather()
+      this.getWeather()
     },
 
     beforeDestroy () {
       this.$store.commit('clock/SET_INTERVAL', null)
+
       this.$store.commit('weather/SET_INTERVAL', null)
     }
   }
