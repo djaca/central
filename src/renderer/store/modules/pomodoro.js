@@ -1,26 +1,21 @@
 import {padZero} from '@/utilities/helpers'
 import config from '@/config'
-import db from '@/database'
 import format from 'date-fns/format'
+import {getForDate, create, update} from '@/database/sessions'
 
 const today = format(new Date(), 'MM-DD-YYYY')
-
-let sessionDuration = config.get('pomodoro.sessionDuration') || 25
-let shortBreak = config.get('pomodoro.shortBreak') || 5
-let longBreak = config.get('pomodoro.longBreak') || 15
-let longBreakInterval = config.get('pomodoro.longBreakInterval') || 3
 
 const state = {
   timer: null,
   isBreak: false,
-  time: sessionDuration * 60,
-  sessionDuration,
-  shortBreak,
-  longBreak,
-  longBreakInterval,
-  workSession: null,
-  isWorkFinished: false,
-  isUserClicked: false
+  isSession: false,
+  time: null,
+  sessionDuration: config.get('pomodoro.sessionDuration') || 0.1,
+  shortBreak: config.get('pomodoro.shortBreak') || 0.1,
+  longBreak: config.get('pomodoro.longBreak') || 0.2,
+  longBreakInterval: config.get('pomodoro.longBreakInterval') || 3,
+  todaySessions: [],
+  isWorkFinished: false
 }
 
 const getters = {
@@ -30,13 +25,17 @@ const getters = {
 
   isActive: state => !!state.timer,
 
-  sessionCount: state => state.workSession ? state.workSession.count : null,
+  sessionCount: state => state.todaySessions.length,
+
+  sessions: state => state.todaySessions,
 
   onBreak: state => state.isBreak,
 
   sessionFinished: state => state.isWorkFinished,
 
   isLongBreak: (state, getters) => getters.sessionCount % state.longBreakInterval === 0,
+
+  isWorking: state => state.isSession,
 
   breakDuration: (state, getters) => getters.isLongBreak ? state.longBreak : state.shortBreak
 }
@@ -63,16 +62,22 @@ const mutations = {
     state.time--
   },
 
-  INCREMENT_WORK_SESSION (state) {
-    state.workSession.count++
+  INCREMENT_WORK_SESSION (state, payload) {
+    state.todaySessions.push(payload)
   },
 
   RESET (state) {
     state.time = state.sessionDuration * 60
+    state.isSession = false
+    state.isBreak = false
 
     clearInterval(state.timer)
 
     state.timer = null
+  },
+
+  TOGGLE_WORK (state, payload) {
+    state.isSession = payload
   },
 
   TOGGLE_BREAK (state, payload) {
@@ -80,7 +85,7 @@ const mutations = {
   },
 
   SET_WORK_SESSION (state, payload) {
-    state.workSession = payload
+    state.todaySessions = payload
   },
 
   SET_FINISH (state, payload) {
@@ -107,25 +112,28 @@ const actions = {
     commit('SET_TIMER', timer)
   },
 
-  endSession ({commit, state}) {
-    db.pomodoro.update({ _id: state.workSession._id }, { $set: { count: state.workSession.count + 1 } }, err => {
-      if (err) {
-        console.log(err)
+  async endSession ({commit, state, dispatch, rootGetters}) {
+    let data = {
+      date: today,
+      project: rootGetters['projects/current'].name,
+      duration: state.sessionDuration
+    }
 
-        return
-      }
+    await create(data)
 
-      commit('RESET')
+    commit('RESET')
 
-      commit('INCREMENT_WORK_SESSION')
+    commit('INCREMENT_WORK_SESSION', data)
 
-      commit('SET_FINISH', true)
-    })
+    dispatch('projects/incrementSession', state.sessionDuration, { root: true })
+
+    commit('SET_FINISH', true)
   },
 
   initSession ({ commit, state, dispatch }) {
     commit('SET_TOTAL_TIME', state.sessionDuration)
 
+    commit('TOGGLE_WORK', true)
     commit('TOGGLE_BREAK', false)
 
     dispatch('init')
@@ -134,6 +142,7 @@ const actions = {
   initBreak ({ commit, state, getters, dispatch }) {
     commit('SET_TOTAL_TIME', (getters.isLongBreak ? state.longBreak : state.shortBreak))
 
+    commit('TOGGLE_WORK', false)
     commit('TOGGLE_BREAK', true)
 
     dispatch('init')
@@ -145,32 +154,16 @@ const actions = {
     commit('RESET')
   },
 
-  getTodayWorkSessionCount ({commit}) {
-    db.pomodoro.findOne({ date: today }, (err, doc) => {
-      if (err) {
-        console.log(err)
+  async getTodayWorkSessionCount ({commit}) {
+    let todaySessions = await getForDate(today)
 
-        return
-      }
+    commit('SET_WORK_SESSION', todaySessions)
+  },
 
-      if (!doc) {
-        db.pomodoro.insert({
-          date: today,
-          count: 0
-        }, (err, newDoc) => {
-          if (err) {
-            console.log(err)
-            return
-          }
+  async replaceProjectName ({commit, rootGetters, dispatch}, {oldName, newName}) {
+    await update({project: oldName}, { $set: { project: newName } }, {multi: true})
 
-          commit('SET_WORK_SESSION', newDoc)
-        })
-
-        return
-      }
-
-      commit('SET_WORK_SESSION', doc)
-    })
+    dispatch('getTodayWorkSessionCount')
   }
 }
 
