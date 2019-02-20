@@ -41,6 +41,7 @@ function createWindow () {
 function createTray () {
   tray = new Tray(path.join(__static, '/trayIcon.png'))
   // tray.setToolTip('Central')
+  tray.setTitle('Central')
 
   // const contextMenu = Menu.buildFromTemplate([
   //   { label: 'Quit', click: () => { app.quit() } }
